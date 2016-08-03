@@ -27,24 +27,13 @@ class ServiceList(AbstractPlugin):
         self.logger.debug(message)
         return result_code, message
 
-    def set_startup_service(self, service_name):
-        (result_code, p_out, p_err) = self.execute('update-rc.d {} defaults'.format(service_name))
+    def set_startup_service(self, service_name, action):
+        (result_code, p_out, p_err) = self.execute('update-rc.d {0} {1}'.format(service_name, action))
 
         if result_code == 0:
             message = 'Service startup action was successful: {}'.format(service_name)
         else:
             message = 'Service action was unsuccessful: {0}, return code {1}'.format(service_name, str(result_code))
-
-        self.logger.debug(message)
-        return result_code, message
-
-    def remove_startup_service(self, service_name):
-        (result_code, p_out, p_err) = self.execute('update-rc.d {} remove'.format(service_name))
-
-        if result_code == 0:
-            message = 'Service startup action removal was successful: {}'.format(service_name)
-        else:
-            message = 'Service action removal was unsuccessful: {0}, return code {1}'.format(service_name, str(result_code))
 
         self.logger.debug(message)
         return result_code, message
@@ -63,10 +52,10 @@ class ServiceList(AbstractPlugin):
                         resultcode, message = self.start_stop_service(str(item['serviceName']), "stop")
                         resultMessage += message
                     if item['serviceStatus'] is not None and (str(item['startAuto']) == 'Başlat' or str(item['startAuto']) == 'Start'):
-                        resultcode, message = self.set_startup_service(str(item['serviceName']))
+                        resultcode, message = self.set_startup_service(str(item['serviceName']), "defaults")
                         resultMessage += message
                     if item['serviceStatus'] is not None and (str(item['startAuto']) == 'Durdur' or str(item['startAuto']) == 'Stop'):
-                        resultcode, message = self.remove_startup_service(str(item['serviceName']))
+                        resultcode, message = self.set_startup_service(str(item['serviceName']), "remove")
                         resultMessage += message
 
                 except Exception as e:
