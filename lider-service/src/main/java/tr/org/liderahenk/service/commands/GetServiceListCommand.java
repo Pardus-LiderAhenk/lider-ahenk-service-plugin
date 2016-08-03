@@ -14,9 +14,9 @@ import tr.org.liderahenk.lider.core.api.service.ICommandResult;
 import tr.org.liderahenk.lider.core.api.service.ICommandResultFactory;
 import tr.org.liderahenk.lider.core.api.service.enums.CommandResultStatus;
 
-public class ServiceCommand implements ICommand {
+public class GetServiceListCommand implements ICommand {
 
-	private Logger logger = LoggerFactory.getLogger(ServiceCommand.class);
+	private Logger logger = LoggerFactory.getLogger(GetServiceListCommand.class);
 	
 	private ICommandResultFactory resultFactory;
 	private IPluginInfo pluginInfo;
@@ -47,7 +47,7 @@ public class ServiceCommand implements ICommand {
 
 	@Override
 	public String getCommandId() {
-		return "SERVICE_MANAGEMENT";
+		return "GET_SERVICES";
 	}
 
 	@Override

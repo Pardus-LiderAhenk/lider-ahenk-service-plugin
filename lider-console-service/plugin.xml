@@ -7,109 +7,38 @@
       <category
             id="tr.org.liderahenk.liderconsole.commands.category"
             name="%commands.category">
-      </category>         
-      <command
-            categoryId="tr.org.liderahenk.liderconsole.commands.category"
-            id="tr.org.liderahenk.liderconsole.commands.ServiceProfile"            
-            name="%command.profile">
-      </command>
+      </category>       
       <command
             categoryId="tr.org.liderahenk.liderconsole.commands.category"
             id="tr.org.liderahenk.liderconsole.commands.ServiceTask"            
             name="%command.task">
+      </command>
+      <command
+            categoryId="tr.org.liderahenk.liderconsole.commands.category"
+            id="tr.org.liderahenk.liderconsole.commands.ServiceListTask"            
+            name="%command.task.servicelist">
       </command>
    </extension>
    
    <extension
        point="org.eclipse.ui.handlers">
 
-		<!-- Profile handler -->
-       	<handler
-            class="tr.org.liderahenk.service.handlers.ServiceProfileHandler"
-            commandId="tr.org.liderahenk.liderconsole.commands.ServiceProfile">
-           <!-- TODO Uncomment this after updating/fixing LiderSourceProvider -->
-		   <!-- <enabledWhen>
-				<and>
-		          <with
-		                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.available">
-		             <equals
-		                   value="true">
-		             </equals>
-		          </with>
-				<with
-	                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
-	             	<equals
-		                   value="true">
-		            </equals>
-	          	</with>
-		       </and>
-		    </enabledWhen> -->        
-      	</handler>
-      	
+
       	<!-- Task handler -->
        <handler
             class="tr.org.liderahenk.service.handlers.ServiceTaskHandler"
-            commandId="tr.org.liderahenk.liderconsole.commands.ServiceTask">
-           <!-- TODO Uncomment this after updating/fixing LiderSourceProvider -->
-		   <!-- <enabledWhen>
-				<and>
-		          <with
-		                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.available">
-		             <equals
-		                   value="true">
-		             </equals>
-		          </with>
-				<with
-	                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
-	             	<equals
-		                   value="true">
-		            </equals>
-	          	</with>
-		       </and>
-		    </enabledWhen> -->        
+            commandId="tr.org.liderahenk.liderconsole.commands.ServiceTask">  
       </handler>
       
+      	<!-- Task handler -->
+       <handler
+            class="tr.org.liderahenk.service.handlers.ServiceListTaskHandler"
+            commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask">  
+      </handler>
   </extension>
   
   <extension
          point="org.eclipse.ui.menus">
-
-		<!-- Add menu command for "profile definition" dialog -->
-		<menuContribution
-            locationURI="menu:tr.org.liderahenk.liderconsole.menus.ProfileDefinition?after=additions">
- 				<command
-                  commandId="tr.org.liderahenk.liderconsole.commands.ServiceProfile"
-                  id="tr.org.liderahenk.liderconsole.commands.ServiceProfile"
-                  tooltip="%command.profile">
-                  <!-- TODO Uncomment this after updating/fixing LiderSourceProvider -->
-				  <!-- <visibleWhen>
-					   <and>
-			                <iterate operator="or">		
-			                	<or>
-							  	<with
-					                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isSearchSelected">
-						             <equals
-						                   value="true">
-						             </equals>
-					          	</with>
-					          	<with
-					                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isEntrySelected">
-						             <equals
-						                   value="true">
-						             </equals>
-					          	</with>
-					        	</or>
-					        </iterate>
-							<with
-				                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
-				             	<equals
-					                   value="true">
-					            </equals>
-				          	</with>
-					    </and>
-					</visibleWhen> -->               
-           		</command>
-		</menuContribution>
       
       	<!-- Add extension point contribution for "task execution" dialogs -->
 		<menuContribution
@@ -119,41 +48,20 @@
                   commandId="tr.org.liderahenk.liderconsole.commands.ServiceTask"
                   id="tr.org.liderahenk.liderconsole.commands.ServiceTask"
                   tooltip="%command.task">
-                  <!-- TODO Uncomment this after updating/fixing LiderSourceProvider -->
-				  <!-- <visibleWhen>
-					   <and>
-			                <iterate operator="or">		
-			                	<or>
-							  	<with
-					                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isSearchSelected">
-						             <equals
-						                   value="true">
-						             </equals>
-					          	</with>
-					          	<with
-					                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isEntrySelected">
-						             <equals
-						                   value="true">
-						             </equals>
-					          	</with>
-					        	</or>
-					        </iterate>
-							<with
-				                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
-				             	<equals
-					                   value="true">
-					            </equals>
-				          	</with>
-					    </and>
-					</visibleWhen> -->               
+           		</command>
+		</menuContribution>
+		
+      
+      	<!-- Add extension point contribution for "task execution" dialogs -->
+		<menuContribution
+      		allPopups="false"
+            locationURI="popup:tr.org.liderahenk.liderconsole.menus.ApplyTask?after=additions">
+ 				<command
+                  commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask"
+                  id="tr.org.liderahenk.liderconsole.commands.ServiceListTask"
+                  tooltip="%command.task.servicelist">
            		</command>
 		</menuContribution>
   </extension>
-  
-	<!-- Add extension point contribution for "policy execution" dialogs -->
-	<extension
-  		point="tr.org.liderahenk.liderconsole.core.policymenu">
-  		<policyItem label="%command.profile" pluginName="service" pluginVersion="1.0.0" profileCommandId="tr.org.liderahenk.liderconsole.commands.ServiceProfile" />
-  	</extension>
   	
 </plugin>

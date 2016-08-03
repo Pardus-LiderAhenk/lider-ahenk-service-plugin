@@ -27,14 +27,24 @@
 		<property name="usesFileTransfer" value="${plugin.uses.file.transfer}" />
 		<property name="xbased" value="${plugin.x.based}" />
 	</bean>
+	<!-- ICommand implementation is used to process a task execution -->
+	<service ref="GetServiceListCommand" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
+	<bean id="GetServiceListCommand" class="tr.org.liderahenk.service.commands.GetServiceListCommand">
+		<property name="resultFactory" ref="resultFactory" />
+		<property name="pluginInfo" ref="pluginInfoImpl" />
+	</bean>
+	<!-- ICommand implementation is used to process a task execution -->
+	<service ref="ServiceListCommand" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
+	<bean id="ServiceListCommand" class="tr.org.liderahenk.service.commands.ServiceListCommand">
+		<property name="resultFactory" ref="resultFactory" />
+		<property name="pluginInfo" ref="pluginInfoImpl" />
+	</bean>
 
 	<!-- ICommand implementation is used to process a task execution -->
 	<service ref="ServiceCommand" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
 	<bean id="ServiceCommand" class="tr.org.liderahenk.service.commands.ServiceCommand">
 		<property name="resultFactory" ref="resultFactory" />
 		<property name="pluginInfo" ref="pluginInfoImpl" />
-		<property name="logService" ref="logService" />
-		<property name="pluginDbService" ref="pluginDbService" />
 	</bean>
 
 	<reference id="pluginDbService" interface="tr.org.liderahenk.lider.core.api.persistence.IPluginDbService" />
