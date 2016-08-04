@@ -39,15 +39,15 @@ class GetServices(AbstractPlugin):
 
     def handle_task(self):
         try:
-            self.logger.debug('[SERVICES ] Executing command for service list.')
+            self.logger.debug('[SERVICE] Executing command for service list.')
             service_list = self.get_service_status()
 
 
-            self.logger.debug('[SERVICES] Command executed.')
+            self.logger.debug('[SERVICE] Command executed.')
 
             self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
                                              message='Servis listesi başarıyla okundu.', data=service_list, content_type=ContentType.APPLICATION_JSON.value)
-            self.logger.debug('[SERVICES] Service list created successfully')
+            self.logger.debug('[SERVICE] Service list created successfully')
         except Exception as e:
             self.logger.error(str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
@@ -85,7 +85,7 @@ class GetServices(AbstractPlugin):
                 service_list.service_list.append(ServiceListItem(line_split[len(line_split)-1], "unknown", auto))
 
         result_service_list = json.dumps(service_list.__dict__, default=encode_service_object)
-        self.logger.debug('Service list: ' + str(result_service_list))
+        self.logger.debug('[SERVICE]' + 'Service list: ' + str(result_service_list))
         return result_service_list
 
 

@@ -25,7 +25,7 @@ class ServiceManagement(AbstractPlugin):
         else:
             message = 'Service action was unsuccessful: {0}, return code {1}'.format(service_action, str(result_code))
 
-        self.logger.debug(message)
+        self.logger.debug('[SERVICE]' + message)
         return result_code, message
 
     def set_startup_service(self, service_name):
@@ -36,7 +36,7 @@ class ServiceManagement(AbstractPlugin):
         else:
             message = 'Service action was unsuccessful: {0}, return code {1}'.format(service_name, str(result_code))
 
-        self.logger.debug(message)
+        self.logger.debug('SERVICE' + message)
         return result_code, message
 
     def handle_task(self):
@@ -60,7 +60,7 @@ class ServiceManagement(AbstractPlugin):
                 self.context.create_response(code=self.message_code.TASK_ERROR.value, message=message)
 
         except Exception as e:
-            self.logger.error(str(e))
+            self.logger.error('[SERVICE]' + str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
                                          message='Servis başlatma/durdurma/otomatik başlatma işlemi sırasında bir hata oluştu: {0}'.format(str(e)))
 
