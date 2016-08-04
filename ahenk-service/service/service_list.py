@@ -29,7 +29,9 @@ class ServiceList(AbstractPlugin):
 
     def set_startup_service(self, service_name, action):
         (result_code, p_out, p_err) = self.execute('update-rc.d {0} {1}'.format(service_name, action))
-
+        self.logger.debug('res_code :' + result_code)
+        self.logger.debug("p_out :" + p_out)
+        self.logger.debug("p_err :" + p_err)
         if result_code == 0:
             message = 'Service startup action was successful: {}'.format(service_name)
         else:
@@ -51,15 +53,15 @@ class ServiceList(AbstractPlugin):
                     if item['serviceStatus'] is not None and (str(item['serviceStatus']) == 'Durdur' or str(item['serviceStatus']) == 'Stop'):
                         resultcode, message = self.start_stop_service(str(item['serviceName']), "stop")
                         resultMessage += message
-                    if item['serviceStatus'] is not None and (str(item['startAuto']) == 'Başlat' or str(item['startAuto']) == 'Start'):
+                    if item['startAuto'] is not None and (str(item['startAuto']) == 'Başlat' or str(item['startAuto']) == 'Start'):
                         resultcode, message = self.set_startup_service(str(item['serviceName']), "defaults")
                         resultMessage += message
-                    if item['serviceStatus'] is not None and (str(item['startAuto']) == 'Durdur' or str(item['startAuto']) == 'Stop'):
+                    if item['startAuto'] is not None and (str(item['startAuto']) == 'Durdur' or str(item['startAuto']) == 'Stop'):
                         resultcode, message = self.set_startup_service(str(item['serviceName']), "remove")
                         resultMessage += message
 
                 except Exception as e:
-                    resultMessage += '{} servisinin isteklerini gerçekleştirirken hata ile karşılaşıldı.\r\n'.format(str(item['serviceName']))
+                    resultMessage += '{0} servisinin isteklerini gerçekleştirirken hata ile karşılaşıldı. Hata : {1}\r\n'.format(str(item['serviceName']), str(e))
 
             data = {'ResultMessage': resultMessage}
 
