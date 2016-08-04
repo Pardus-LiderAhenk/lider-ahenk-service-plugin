@@ -11,7 +11,8 @@ class Init(AbstractPlugin):
         self.logger = self.get_logger()
 
     def handle_mode(self):
-        # TODO Do what do you want to do!
+        if self.is_installed('chkconfig') is False:
+            self.install_with_apt_get('chkconfig')
         pass
 
 

@@ -24,24 +24,21 @@ class ServiceList(AbstractPlugin):
         else:
             message = 'Service action was unsuccessful: {0}, return code {1}'.format(service_action, str(result_code))
 
-        self.logger.debug(message)
+        self.logger.debug('[SERVICE]' + message)
         return result_code, message
 
     def set_startup_service(self, service_name, action):
         (result_code, p_out, p_err) = self.execute('update-rc.d {0} {1}'.format(service_name, action))
-        self.logger.debug('res_code :' + result_code)
-        self.logger.debug("p_out :" + p_out)
-        self.logger.debug("p_err :" + p_err)
         if result_code == 0:
             message = 'Service startup action was successful: {}'.format(service_name)
         else:
             message = 'Service action was unsuccessful: {0}, return code {1}'.format(service_name, str(result_code))
 
-        self.logger.debug(message)
+        self.logger.debug('[SERVICE]' + message)
         return result_code, message
 
     def handle_task(self):
-        self.logger.debug('Handling Packages Task')
+        self.logger.debug('Handling Service Task')
         try:
             items = (self.data)['serviceRequestParameters']
             resultMessage = ""
@@ -62,7 +59,7 @@ class ServiceList(AbstractPlugin):
 
                 except Exception as e:
                     resultMessage += '{0} servisinin isteklerini gerçekleştirirken hata ile karşılaşıldı. Hata : {1}\r\n'.format(str(item['serviceName']), str(e))
-
+            self.logger.debug('[SERVICE]' + resultMessage)
             data = {'ResultMessage': resultMessage}
 
             self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
@@ -70,7 +67,7 @@ class ServiceList(AbstractPlugin):
                                          data=json.dumps(data),
                                          content_type=ContentType.APPLICATION_JSON.value)
         except Exception as e:
-            self.logger.debug(str(e))
+            self.logger.debug('[SERVICE] Service List Exception :' + str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
                                          message='Servis istekleri gerçekleştirilirken beklenmedik hata!',
                                          content_type=ContentType.APPLICATION_JSON.value)
