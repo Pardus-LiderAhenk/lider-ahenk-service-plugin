@@ -36,6 +36,7 @@ class GetServices(AbstractPlugin):
 
         self.temp_file_name = str(self.generate_uuid())
         self.file_path = '{0}{1}'.format(str(self.Ahenk.received_dir_path()), self.temp_file_name)
+        self.service_status = 'service {} status'
 
     def handle_task(self):
         try:
@@ -51,8 +52,7 @@ class GetServices(AbstractPlugin):
         except Exception as e:
             self.logger.error(str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
-                                         message='Servis listesi oluşturulurken hata oluştu: ' + str(e),
-                                         content_type=ContentType.APPLICATION_JSON.value)
+                                         message='Servis listesi oluşturulurken hata oluştu: ' + str(e))
 
     def get_service_status(self):
         (result_code, p_out, p_err) = self.execute("service --status-all")
@@ -66,12 +66,20 @@ class GetServices(AbstractPlugin):
             if len(line_split) >= 5:
                 proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split)-1], shell=True)
                 auto = "INACTIVE"
+                name = line_split[len(line_split) - 1]
+
                 if proc.wait() == 0:
                     auto = "ACTIVE"
-                if line_split[len(line_split)-4] == '+':
-                    service_list.service_list.append(ServiceListItem(line_split[len(line_split)-1], "ACTIVE", auto))
-                elif line_split[len(line_split)-4] == '-':
-                    service_list.service_list.append(ServiceListItem(line_split[len(line_split)-1], "INACTIVE", auto))
+
+                result, out, err = self.execute(self.service_status.format(name))
+
+                if 'Unknown job' not in str(err):
+                    if line_split[len(line_split)-4] == '+':
+                        service_list.service_list.append(ServiceListItem(name, "ACTIVE", auto))
+                    elif line_split[len(line_split)-4] == '-':
+                        service_list.service_list.append(ServiceListItem(name, "INACTIVE", auto))
+                else:
+                    self.logger.debug('[SERVICE] Service \'{0}\' has been not added to the list because of the its {1}'.format(name, err))
 
         line_err = p_err.split(',')
 
