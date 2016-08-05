@@ -69,8 +69,7 @@ class ServiceList(AbstractPlugin):
         except Exception as e:
             self.logger.debug('[SERVICE] Service List Exception :' + str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
-                                         message='Servis istekleri gerçekleştirilirken beklenmedik hata!',
-                                         content_type=ContentType.APPLICATION_JSON.value)
+                                         message='Servis istekleri gerçekleştirilirken beklenmedik hata!')
 
 
 def handle_task(task, context):
