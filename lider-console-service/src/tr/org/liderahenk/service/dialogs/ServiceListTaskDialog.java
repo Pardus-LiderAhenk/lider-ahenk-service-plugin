@@ -67,8 +67,8 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 	private ServiceListItem selectedService;
 	private final Image activeImage;
 	private final Image inactiveImage;
-	
-	public ServiceListTaskDialog(Shell parentShell,String dn) {
+
+	public ServiceListTaskDialog(Shell parentShell, String dn) {
 		super(parentShell, dn);
 		subscribeEventHandler(eventHandler);
 		activeImage = new Image(Display.getDefault(),
@@ -89,15 +89,15 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
-		
+
 		createButtonsArea(composite);
 		createTableArea(composite);
-		
+
 		return null;
 	}
 
 	private void createButtonsArea(Composite parent) {
-		
+
 		final Composite composite = new Composite(parent, GridData.FILL);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, false, false);
 		gd.widthHint = 1300;
@@ -120,6 +120,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			}
 		});
 	}
+
 	public class TableFilter extends ViewerFilter {
 
 		private String searchString;
@@ -177,7 +178,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 				return Messages.getString("UNTITLED");
 			}
 		});
-		
+
 		// Package name
 		TableViewerColumn serviceStatusColumn = SWTResourceManager.createTableViewerColumn(tableViewer,
 				Messages.getString("SERVICE_STAT"), 250);
@@ -193,9 +194,10 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			@Override
 			public Image getImage(Object element) {
 				if (element instanceof ServiceListItem) {
-					if(Messages.getString(((ServiceListItem) element).getServiceStatus()).equals("Aktif") || Messages.getString(((ServiceListItem) element).getServiceStatus()).equals("Active")){
+					if (Messages.getString(((ServiceListItem) element).getServiceStatus()).equals("Aktif")
+							|| Messages.getString(((ServiceListItem) element).getServiceStatus()).equals("Active")) {
 						return activeImage;
-					}else
+					} else
 						return inactiveImage;
 				}
 				return null;
@@ -214,7 +216,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			}
 		});
 		desiredStatusColumn.setEditingSupport(new StatusEditingSupport(tableViewer));
-		
+
 		// Package name
 		TableViewerColumn autoStartColumn = SWTResourceManager.createTableViewerColumn(tableViewer,
 				Messages.getString("START_AUTO"), 250);
@@ -230,16 +232,16 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			@Override
 			public Image getImage(Object element) {
 				if (element instanceof ServiceListItem) {
-					if(Messages.getString(((ServiceListItem) element).getStartAuto()).equals("Aktif") || Messages.getString(((ServiceListItem) element).getStartAuto()).equals("Active")){
+					if (Messages.getString(((ServiceListItem) element).getStartAuto()).equals("Aktif")
+							|| Messages.getString(((ServiceListItem) element).getStartAuto()).equals("Active")) {
 						return activeImage;
-					}else
+					} else
 						return inactiveImage;
 				}
 				return null;
 			}
 		});
-		
-		
+
 		// Desired status
 		TableViewerColumn desiredStartAutoColumn = SWTResourceManager.createTableViewerColumn(tableViewer,
 				Messages.getString("DESIRED_START_AT_BEGINNING"), 250);
@@ -259,7 +261,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 	private void getServices() {
 		try {
 			TaskRequest task = new TaskRequest(new ArrayList<String>(getDnSet()), DNType.AHENK, getPluginName(),
-					getPluginVersion(), "GET_SERVICES", null, null, new Date());
+					getPluginVersion(), "GET_SERVICES", null, null, null, new Date());
 			TaskRestUtils.execute(task);
 
 		} catch (Exception e) {
@@ -267,7 +269,6 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			Notifier.error(null, Messages.getString("ERROR_ON_LIST"));
 		}
 	}
-
 
 	private void createTableFilterArea(Composite parent) {
 		Composite filterContainer = new Composite(parent, SWT.NONE);
@@ -281,7 +282,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 		lblSearch.setText(Messages.getString("FILTER"));
 
 		// Filter table rows
-		txtFilter= new Text(filterContainer, SWT.BORDER | SWT.SEARCH);
+		txtFilter = new Text(filterContainer, SWT.BORDER | SWT.SEARCH);
 		txtFilter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		txtFilter.setToolTipText(Messages.getString("FILTER"));
 		txtFilter.addModifyListener(new ModifyListener() {
@@ -291,16 +292,20 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 				tableViewer.refresh();
 			}
 		});
-	}		
+	}
 
 	@Override
 	public void validateBeforeExecution() throws ValidationException {
 		TableItem[] items = tableViewer.getTable().getItems();
 		for (TableItem tableItem : items) {
-			if(!tableItem.getText(2).equals(Messages.getString("NA"))){//if DesiredService status exists
+			if (!tableItem.getText(2).equals(Messages.getString("NA"))) {// if
+																			// DesiredService
+																			// status
+																			// exists
 				return;
-			}
-			else if(!tableItem.getText(4).equals(Messages.getString("NA"))){//if DesiredStartAtuo exists
+			} else if (!tableItem.getText(4).equals(Messages.getString("NA"))) {// if
+																				// DesiredStartAtuo
+																				// exists
 				return;
 			}
 		}
@@ -313,13 +318,19 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 		List<ServiceListItem> list = new ArrayList<>();
 		TableItem[] items = tableViewer.getTable().getItems();
 		for (TableItem tableItem : items) {
-			if(!tableItem.getText(2).equals(Messages.getString("NA")) || !tableItem.getText(4).equals(Messages.getString("NA"))){
+			if (!tableItem.getText(2).equals(Messages.getString("NA"))
+					|| !tableItem.getText(4).equals(Messages.getString("NA"))) {
 				ServiceListItem item = new ServiceListItem();
 				item.setServiceName(tableItem.getText(0).toString());
-				if(!tableItem.getText(2).equals(Messages.getString("NA"))){//if DesiredService status exists
+				if (!tableItem.getText(2).equals(Messages.getString("NA"))) {// if
+																				// DesiredService
+																				// status
+																				// exists
 					item.setServiceStatus(tableItem.getText(2).toString());
 				}
-				if(!tableItem.getText(4).equals(Messages.getString("NA"))){//if DesiredStartAtuo exists
+				if (!tableItem.getText(4).equals(Messages.getString("NA"))) {// if
+																				// DesiredStartAtuo
+																				// exists
 					item.setStartAuto(tableItem.getText(4).toString());
 				}
 				list.add(item);
@@ -351,7 +362,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 	public void setSelectedService(ServiceListItem selectedService) {
 		this.selectedService = selectedService;
 	}
-	
+
 	private EventHandler eventHandler = new EventHandler() {
 		@Override
 		public void handleEvent(final Event event) {
@@ -365,14 +376,14 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 						byte[] data = taskStatus.getResult().getResponseData();
 						final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
 								new TypeReference<HashMap<String, Object>>() {
-						});
+								});
 						Display.getDefault().asyncExec(new Runnable() {
 
 							@Override
 							public void run() {
-								if(responseData != null && responseData.containsKey("ResultMessage")){
+								if (responseData != null && responseData.containsKey("ResultMessage")) {
 									getServices();
-								}else if(responseData != null && responseData.containsKey("service_list")){
+								} else if (responseData != null && responseData.containsKey("service_list")) {
 									List<HashMap<String, Object>> tableItems = cast(responseData.get("service_list"));
 									List<ServiceListItem> items = new ArrayList<>();
 									for (HashMap<String, Object> map : tableItems) {
@@ -384,9 +395,9 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 										item.setDesiredStartAuto(DesiredStatus.NA);
 										items.add(item);
 									}
-									if(items != null ){
+									if (items != null) {
 										tableViewer.setInput(items);
-										tableViewer.refresh();	
+										tableViewer.refresh();
 									}
 								}
 							}
@@ -406,9 +417,9 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			job.schedule();
 		}
 	};
-	
+
 	@SuppressWarnings("unchecked")
 	public static <HashMap extends List<?>> HashMap cast(Object obj) {
-	    return (HashMap) obj;
+		return (HashMap) obj;
 	}
 }
