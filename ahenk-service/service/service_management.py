@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Author: Cemre ALPSOY <cemre.alpsoy@agem.com.tr>
-from parser import st2list
-
-from html5lib.serializer import serialize
 
 from base.plugin.abstract_plugin import AbstractPlugin
 import json

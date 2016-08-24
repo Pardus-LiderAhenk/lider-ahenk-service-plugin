@@ -4,7 +4,6 @@
 
 import json
 import subprocess
-from base.model.enum.ContentType import ContentType
 from base.plugin.abstract_plugin import AbstractPlugin
 
 
@@ -47,7 +46,7 @@ class GetServices(AbstractPlugin):
             self.logger.debug('[SERVICE] Command executed.')
 
             self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
-                                             message='Servis listesi başarıyla okundu.', data=service_list, content_type=ContentType.APPLICATION_JSON.value)
+                                             message='Servis listesi başarıyla okundu.', data=service_list, content_type=self.get_content_type().APPLICATION_JSON.value)
             self.logger.debug('[SERVICE] Service list created successfully')
         except Exception as e:
             self.logger.error(str(e))

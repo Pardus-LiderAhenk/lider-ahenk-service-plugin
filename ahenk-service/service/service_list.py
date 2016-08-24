@@ -4,7 +4,6 @@
 
 import json
 
-from base.model.enum.ContentType import ContentType
 from base.plugin.abstract_plugin import AbstractPlugin
 
 
@@ -65,7 +64,7 @@ class ServiceList(AbstractPlugin):
             self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
                                          message='Servis istekleri gerçekleştirildi',
                                          data=json.dumps(data),
-                                         content_type=ContentType.APPLICATION_JSON.value)
+                                         content_type=self.get_content_type().APPLICATION_JSON.value)
         except Exception as e:
             self.logger.debug('[SERVICE] Service List Exception :' + str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
