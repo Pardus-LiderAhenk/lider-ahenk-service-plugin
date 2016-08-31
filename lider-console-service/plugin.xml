@@ -49,22 +49,6 @@
            icon="icons/16/service.png"
            id="tr.org.liderahenk.liderconsole.commands.ServiceTask"
            tooltip="%command.task">
-        <visibleWhen>
-           <and>
-              <with
-                    variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.available">
-                 <equals
-                       value="true">
-                 </equals>
-              </with>
-              <with
-                    variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
-                 <equals
-                       value="true">
-                 </equals>
-              </with>
-           </and>
-        </visibleWhen>
            		</command>
 		</menuContribution>
 		
@@ -78,22 +62,22 @@
            icon="icons/16/services.png"
            id="tr.org.liderahenk.liderconsole.commands.ServiceListTask"
            tooltip="%command.task.servicelist">
-        <visibleWhen>
-           <and>
-              <with
-                    variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.available">
-                 <equals
-                       value="true">
-                 </equals>
-              </with>
-              <with
-                    variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
-                 <equals
-                       value="true">
-                 </equals>
-              </with>
-           </and>
-        </visibleWhen>
+				  	<visibleWhen>
+				  		<and>
+							<with
+				                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isSingleEntrySelected">
+				             	<equals
+					                   value="true">
+					            </equals>
+				          	</with>
+							<with
+				                variable="tr.org.liderahenk.liderconsole.core.sourceproviders.main.isAhenkSelected">
+				             	<equals
+					                   value="true">
+					            </equals>
+				          	</with>
+			          	</and>
+					</visibleWhen>
            		</command>
 		</menuContribution>
   </extension>
