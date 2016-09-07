@@ -22,15 +22,10 @@
    
    <extension
        point="org.eclipse.ui.handlers">
-
-
-      	<!-- Task handler -->
        <handler
             class="tr.org.liderahenk.service.handlers.ServiceTaskHandler"
             commandId="tr.org.liderahenk.liderconsole.commands.ServiceTask">  
       </handler>
-      
-      	<!-- Task handler -->
        <handler
             class="tr.org.liderahenk.service.handlers.ServiceListTaskHandler"
             commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask">  
@@ -48,7 +43,7 @@
            commandId="tr.org.liderahenk.liderconsole.commands.ServiceTask"
            icon="icons/16/service.png"
            id="tr.org.liderahenk.liderconsole.commands.ServiceTask"
-           tooltip="%command.task">
+           tooltip="%command.manage.services.task">
                   	<visibleWhen>
                   	<and>
 							<with
@@ -83,7 +78,7 @@
            commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask"
            icon="icons/16/services.png"
            id="tr.org.liderahenk.liderconsole.commands.ServiceListTask"
-           tooltip="%command.task.servicelist">
+           tooltip="%command.list.services.task">
 				  	<visibleWhen>
 				  		<and>
 							<with
@@ -103,5 +98,14 @@
            		</command>
 		</menuContribution>
   </extension>
+  
+	<!-- Add extension point contribution for i18n messages -->
+	<extension
+  		point="tr.org.liderahenk.liderconsole.core.i18n">
+  		<task code="SERVICE_LIST" label="%command.manage.services.task" />
+  		<task code="SERVICE_MANAGEMENT" label="%command.manage.services.task" />
+  		<task code="GET_SERVICES" label="%command.list.services.task" />
+		<plugin name="service" label="%plugin.label" />
+  	</extension>
   	
 </plugin>
