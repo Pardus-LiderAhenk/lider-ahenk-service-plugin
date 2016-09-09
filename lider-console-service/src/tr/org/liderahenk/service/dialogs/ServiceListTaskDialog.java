@@ -373,7 +373,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 					try {
 						TaskStatusNotification taskStatus = (TaskStatusNotification) event
 								.getProperty("org.eclipse.e4.data");
-						byte[] data = taskStatus.getResult().getResponseData();
+						byte[] data = TaskRestUtils.getResponseData(taskStatus.getResult().getId());
 						final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
 								new TypeReference<HashMap<String, Object>>() {
 								});
