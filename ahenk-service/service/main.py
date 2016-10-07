@@ -2,4 +2,14 @@
 # -*- coding: utf-8 -*-
 
 def info():
-    return None
+    inf = dict()
+    inf['name'] = 'service'
+    inf['version'] = '1.0.0'
+    inf['support'] = 'debian'
+    inf['description'] = ''
+    inf['task'] = True
+    inf['user_oriented'] = False
+    inf['machine_oriented'] = False
+    inf['developer'] = ''
+
+    return inf
