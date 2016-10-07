@@ -22,7 +22,7 @@ class ServiceManagement(AbstractPlugin):
         else:
             message = 'Service action was unsuccessful: {0}, return code {1}'.format(service_action, str(result_code))
 
-        self.logger.debug('[SERVICE]' + message)
+        self.logger.debug(message)
         return result_code, message
 
     def set_startup_service(self, service_name):
@@ -38,7 +38,7 @@ class ServiceManagement(AbstractPlugin):
 
     def handle_task(self):
         try:
-            self.logger.debug("[SERVICE] Service Management task is started.")
+            self.logger.debug("Service Management task is started.")
             service_name = str((self.data)['serviceName'])
             service_status = str((self.data)['serviceStatus'])
             start_auto = bool((self.data)['startAuto'])
@@ -51,15 +51,17 @@ class ServiceManagement(AbstractPlugin):
                 result_code, message = self.set_startup_service(service_name)
             if result_code == 0:
                 self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
-                                         message='Servis başlatma/durdurma/otomatik başlatma işlemi başarıyla gerçekleştirildi',
-                                         data=json.dumps(self.data), content_type=self.get_content_type().APPLICATION_JSON.value)
+                                             message='Servis başlatma/durdurma/otomatik başlatma işlemi başarıyla gerçekleştirildi',
+                                             data=json.dumps(self.data),
+                                             content_type=self.get_content_type().APPLICATION_JSON.value)
             else:
                 self.context.create_response(code=self.message_code.TASK_ERROR.value, message=message)
 
         except Exception as e:
-            self.logger.error('[SERVICE]' + str(e))
+            self.logger.error(str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
-                                         message='Servis başlatma/durdurma/otomatik başlatma işlemi sırasında bir hata oluştu: {0}'.format(str(e)))
+                                         message='Servis başlatma/durdurma/otomatik başlatma işlemi sırasında bir hata oluştu: {0}'.format(
+                                             str(e)))
 
 
 def handle_task(task, context):

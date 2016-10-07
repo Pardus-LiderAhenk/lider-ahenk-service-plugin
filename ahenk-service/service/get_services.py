@@ -40,30 +40,29 @@ class GetServices(AbstractPlugin):
 
     def handle_task(self):
         try:
-            self.logger.debug('[SERVICE] Executing command for service list.')
+            self.logger.debug('Executing command for service list.')
             self.get_service_status()
 
-
-            self.logger.debug('[SERVICE] Command executed.')
+            self.logger.debug('Command executed.')
 
             if self.is_exist(self.file_path):
                 data = {}
                 self.logger.debug(str(self.file_path))
                 md5sum = self.get_md5_file(str(self.file_path))
-                self.logger.debug('[SERVICE] {0} renaming to {1}'.format(self.temp_file_name, md5sum))
+                self.logger.debug('{0} renaming to {1}'.format(self.temp_file_name, md5sum))
                 self.rename_file(self.file_path, self.Ahenk.received_dir_path() + '/' + md5sum)
-                self.logger.debug('[SERVICE] Renamed.' + self.Ahenk.received_dir_path() + '/' + md5sum)
+                self.logger.debug('Renamed.' + self.Ahenk.received_dir_path() + '/' + md5sum)
                 data['md5'] = md5sum
                 self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
                                              message='Servis listesi başarıyla okundu.',
                                              data=json.dumps(data),
                                              content_type=self.get_content_type().TEXT_PLAIN.value)
-                self.logger.debug("[SERVICE] Execution Info fetched succesfully. ")
-                self.logger.debug("[SERVICE] Execution Info has sent")
+                self.logger.debug("Execution Info fetched succesfully. ")
+                self.logger.debug("Execution Info has sent")
             else:
                 self.context.create_response(code=self.message_code.TASK_ERROR.value,
                                              message='Servis listesi getirilemedi')
-            self.logger.debug('[SERVICE] Service list created successfully')
+            self.logger.debug('Service list created successfully')
         except Exception as e:
             self.logger.error(str(e))
             self.context.create_response(code=self.message_code.TASK_ERROR.value,
@@ -73,7 +72,7 @@ class GetServices(AbstractPlugin):
         if self.isRecordExist == 0:
             self.execute('echo { \\"service_list\\" :[ >> ' + self.file_path)
             self.isRecordExist = 1
-        t_command = 'echo "{ \\"serviceName\\": \\"' + name + '\\", \\"serviceStatus\\": \\"' + status +'\\", \\"startAuto\\":\\"' + auto_start + '\\"}" >> ' + self.file_path
+        t_command = 'echo "{ \\"serviceName\\": \\"' + name + '\\", \\"serviceStatus\\": \\"' + status + '\\", \\"startAuto\\":\\"' + auto_start + '\\"}" >> ' + self.file_path
         self.execute(t_command)
         self.execute('echo , >> ' + self.file_path)
 
@@ -87,7 +86,8 @@ class GetServices(AbstractPlugin):
         for line in lines:
             line_split = line.split(' ')
             if len(line_split) >= 5:
-                proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split)-1], shell=True)
+                proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split) - 1],
+                                        shell=True)
                 auto = "INACTIVE"
                 name = line_split[len(line_split) - 1]
 
@@ -97,25 +97,27 @@ class GetServices(AbstractPlugin):
                 result, out, err = self.execute(self.service_status.format(name))
 
                 if 'Unknown job' not in str(err):
-                    if line_split[len(line_split)-4] == '+':
+                    if line_split[len(line_split) - 4] == '+':
                         self.add_file(name, "ACTIVE", auto)
                         # service_list.service_list.append(ServiceListItem(name, "ACTIVE", auto))
-                    elif line_split[len(line_split)-4] == '-':
+                    elif line_split[len(line_split) - 4] == '-':
                         self.add_file(name, "INACTIVE", auto)
                         # service_list.service_list.append(ServiceListItem(name, "INACTIVE", auto))
                 else:
-                    self.logger.debug('[SERVICE] Service \'{0}\' has been not added to the list because of the its {1}'.format(name, err))
+                    self.logger.debug(
+                        'Service \'{0}\' has been not added to the list because of the its {1}'.format(name, err))
 
         line_err = p_err.split(',')
 
         for line in line_err:
             line_split = line.split(' ')
             if len(line_split) >= 6:
-                proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split)-1], shell=True)
+                proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split) - 1],
+                                        shell=True)
                 auto = "INACTIVE"
                 if proc.wait() == 0:
                     auto = "ACTIVE"
-                self.add_file(line_split[len(line_split)-1], "unknown", auto)
+                self.add_file(line_split[len(line_split) - 1], "unknown", auto)
                 # service_list.service_list.append(ServiceListItem(line_split[len(line_split)-1], "unknown", auto))
 
         # result_service_list = json.dumps(service_list.__dict__, default=encode_service_object)
