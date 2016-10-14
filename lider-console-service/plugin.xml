@@ -34,11 +34,20 @@
   
   <extension
          point="org.eclipse.ui.menus">
-      
+               
+		<menuContribution
+			locationURI="popup:tr.org.liderahenk.liderconsole.menus.ApplyTask?after=additions">
+			<menu
+				id="tr.org.liderahenk.liderconsole.menus.Service"
+				label="%plugin.label"
+				icon="icons/16/service.png">
+			</menu>
+		</menuContribution>
+		
       	<!-- Add extension point contribution for "task execution" dialogs -->
 		<menuContribution
       		allPopups="false"
-            locationURI="popup:tr.org.liderahenk.liderconsole.menus.ApplyTask?after=additions">
+            locationURI="popup:tr.org.liderahenk.liderconsole.menus.Service?after=additions">
  				<command
            commandId="tr.org.liderahenk.liderconsole.commands.ServiceTask"
            icon="icons/16/service.png"
@@ -73,7 +82,7 @@
       	<!-- Add extension point contribution for "task execution" dialogs -->
 		<menuContribution
       		allPopups="false"
-            locationURI="popup:tr.org.liderahenk.liderconsole.menus.ApplyTask?after=additions">
+            locationURI="popup:tr.org.liderahenk.liderconsole.menus.Service?after=additions">
  				<command
            commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask"
            icon="icons/16/services.png"
