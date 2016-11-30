@@ -1,4 +1,4 @@
-service (1.0.0) unstable; urgency=low
+service (1.0.0-alfa) unstable; urgency=low
 
   * service Plugin
 
