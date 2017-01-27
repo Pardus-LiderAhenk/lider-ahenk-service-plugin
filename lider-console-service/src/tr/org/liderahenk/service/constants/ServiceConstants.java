@@ -4,7 +4,7 @@ public class ServiceConstants {
 	
 	public static final String PLUGIN_NAME = "service";
 	
-	public static final String PLUGIN_VERSION = "1.0.0";
+	public static final String PLUGIN_VERSION = "1.0.0-beta";
 	
 	public static final class SERVICE_MANAGEMENT_PARAMETERS {
 		public static final String SERVICE_NAME = "serviceName";
