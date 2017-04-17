@@ -117,4 +117,15 @@
 		<plugin name="service" label="%plugin.label" />
   	</extension>
   	
+  	<extension
+  		point="tr.org.liderahenk.liderconsole.core.taskmenu">
+  		<taskItem label="%command.task" pluginName="service" pluginVersion="1.0.0" taskCommandId="tr.org.liderahenk.liderconsole.commands.ServiceTask" />
+  	</extension>
+  	
+  	<extension
+  		point="tr.org.liderahenk.liderconsole.core.taskmenu">
+  		<taskItem label="%command.task.servicelist" pluginName="service" pluginVersion="1.0.0" taskCommandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask" />
+  	</extension>
+  
+  	
 </plugin>
