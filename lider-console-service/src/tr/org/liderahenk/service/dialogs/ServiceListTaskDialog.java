@@ -278,7 +278,6 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 		// Search label
 		Label lblSearch = new Label(filterContainer, SWT.NONE);
 		lblSearch.setFont(SWTResourceManager.getFont("Sans", 9, SWT.BOLD));
-		lblSearch.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		lblSearch.setText(Messages.getString("FILTER"));
 
 		// Filter table rows
@@ -298,14 +297,9 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 	public void validateBeforeExecution() throws ValidationException {
 		TableItem[] items = tableViewer.getTable().getItems();
 		for (TableItem tableItem : items) {
-			if (!tableItem.getText(2).equals(Messages.getString("NA"))) {// if
-																			// DesiredService
-																			// status
-																			// exists
+			if (!tableItem.getText(2).equals(Messages.getString("NA"))) {
 				return;
-			} else if (!tableItem.getText(4).equals(Messages.getString("NA"))) {// if
-																				// DesiredStartAtuo
-																				// exists
+			} else if (!tableItem.getText(4).equals(Messages.getString("NA"))) {
 				return;
 			}
 		}
@@ -322,10 +316,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 					|| !tableItem.getText(4).equals(Messages.getString("NA"))) {
 				ServiceListItem item = new ServiceListItem();
 				item.setServiceName(tableItem.getText(0).toString());
-				if (!tableItem.getText(2).equals(Messages.getString("NA"))) {// if
-																				// DesiredService
-																				// status
-																				// exists
+				if (!tableItem.getText(2).equals(Messages.getString("NA"))) {// if Desired Servicestatus  exists
 					item.setServiceStatus(tableItem.getText(2).toString());
 				}
 				if (!tableItem.getText(4).equals(Messages.getString("NA"))) {// if
