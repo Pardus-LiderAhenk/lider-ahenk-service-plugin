@@ -30,6 +30,7 @@
 
     <feature name="lider-service-bundles" version="${project.version}">
 		<bundle>mvn:tr.org.liderahenk/lider-service/${project.version}</bundle>
+		<bundle>mvn:tr.org.liderahenk/lider-service-db/${project.version}</bundle>
 		<configfile finalname="/etc/tr.org.liderahenk.service.cfg">mvn:tr.org.liderahenk/lider-service/${project.version}/cfg</configfile>
     </feature>
 

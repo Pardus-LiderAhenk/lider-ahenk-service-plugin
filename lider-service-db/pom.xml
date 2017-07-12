@@ -45,7 +45,7 @@
 					<instructions>
 						<_removeheaders>Import-Service,Export-Service</_removeheaders>
 						<Fragment-Host>lider-persistence-mariadb;bundle-version="[1.0.0,2)"</Fragment-Host>
-						<Bundle-SymbolicName>lider-manage-root-db</Bundle-SymbolicName>
+						<Bundle-SymbolicName>lider-service-db</Bundle-SymbolicName>
 						<Bundle-Version>1.0.0</Bundle-Version>
 					</instructions>
 				</configuration>
