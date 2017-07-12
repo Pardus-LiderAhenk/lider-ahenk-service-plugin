@@ -41,11 +41,31 @@
 	</bean>
 
 	<!-- ICommand implementation is used to process a task execution -->
-	<service ref="ServiceCommand" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
+	<service ref="ServiceCommand">
+		<interfaces>
+			<value>tr.org.liderahenk.lider.core.api.plugin.ICommand</value>
+			<value>tr.org.liderahenk.lider.core.api.plugin.ITaskAwareCommand</value>
+		</interfaces>
+	</service>
+	
 	<bean id="ServiceCommand" class="tr.org.liderahenk.service.commands.ServiceCommand">
 		<property name="resultFactory" ref="resultFactory" />
 		<property name="pluginInfo" ref="pluginInfoImpl" />
+		<property name="pluginDbService" ref="pluginDbService" />
+	</bean>
+
+
+	<!-- ICommand implementation is used to process a task execution -->
+	<service ref="GetServices" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
+	<bean id="GetServices" class="tr.org.liderahenk.service.commands.GetServicesFromDbCommand">
+		<property name="resultFactory" ref="resultFactory" />
+		<property name="pluginInfo" ref="pluginInfoImpl" />
+		<property name="pluginDbService" ref="pluginDbService" />
 	</bean>
 
 	<reference id="resultFactory" interface="tr.org.liderahenk.lider.core.api.service.ICommandResultFactory" />
+	
+	<reference id="pluginDbService" interface="tr.org.liderahenk.lider.core.api.persistence.IPluginDbService" />
+	
+	<reference id="logService" interface="tr.org.liderahenk.lider.core.api.log.IOperationLogService" />
 </blueprint>

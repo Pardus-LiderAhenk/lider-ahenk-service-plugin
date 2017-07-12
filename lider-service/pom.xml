@@ -38,6 +38,13 @@
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-jpa_2.0_spec</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>tr.org.liderahenk</groupId>
+			<artifactId>lider-service-db</artifactId>
+			<version>1.0.0</version>
+			<type>bundle</type>
+		</dependency>
 	</dependencies>
 
 	<build>

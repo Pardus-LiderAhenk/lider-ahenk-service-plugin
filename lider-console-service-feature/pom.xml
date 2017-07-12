@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>lider-console-service-feature</artifactId>
-	<name>lider-console-remote-access-feature</name>
+	<name>lider-console-service-feature</name>
 
 	<packaging>eclipse-feature</packaging>
 
