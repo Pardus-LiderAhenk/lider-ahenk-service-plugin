@@ -9,6 +9,10 @@ import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -33,14 +37,20 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.liderconsole.core.dialogs.DefaultTaskDialog;
 import tr.org.liderahenk.liderconsole.core.exceptions.ValidationException;
+import tr.org.liderahenk.liderconsole.core.ldap.enums.DNType;
 import tr.org.liderahenk.liderconsole.core.rest.requests.TaskRequest;
 import tr.org.liderahenk.liderconsole.core.rest.responses.IResponse;
 import tr.org.liderahenk.liderconsole.core.rest.utils.TaskRestUtils;
 import tr.org.liderahenk.liderconsole.core.utils.SWTResourceManager;
 import tr.org.liderahenk.liderconsole.core.widgets.Notifier;
+import tr.org.liderahenk.liderconsole.core.xmpp.notifications.TaskStatusNotification;
 import tr.org.liderahenk.service.constants.ServiceConstants;
 import tr.org.liderahenk.service.editingsupport.StatusEditingSupport;
 import tr.org.liderahenk.service.i18n.Messages;
@@ -52,13 +62,15 @@ import tr.org.liderahenk.service.model.ServiceListItem;
  * 
  */
 public class ServiceTaskDialog extends DefaultTaskDialog {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ServiceTaskDialog.class);
 
 	private Label lblServiceName;
 	private Text txtServiceName;
 	private Label lblServiceStat;
 	private Combo cmbServiceStat;
 	private Button chkStartAuto;
-	private static final String[] serviceStatArray = new String[] { "NA", "START", "STOP", "RESTART" };
+	private static final String[] serviceStatArray = new String[] { "NA", "Start", "Stop" };
 	private Composite compositeServiceList;
 	//private TableViewer tableViewerServiceMonitor;
 	private TableViewer tableViewerServiceManage;
@@ -70,13 +82,11 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 
 	private List<ServiceListItem> serviceList;
 	private List<ServiceListItem> deletedServiceList;
-	private Button btnDeleteServiceMonitor;
 	private TabFolder tabFolder;
-	private TabItem tbtmServiceMonitor;
 	private TabItem tbtmServiceManage;
-	private Composite compositeServiceListMonitor;
 	private Composite compositeServiceListManage;
 	private Button btnDeleteServiceManage;
+	private Button btnManageService;
 
 	public ServiceTaskDialog(Shell parentShell, Set<String> dnSet) {
 		super(parentShell, dnSet,false, true, true);
@@ -87,6 +97,8 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 
 		serviceList = new ArrayList<>();
 		deletedServiceList= new ArrayList<>();
+		
+		subscribeEventHandler(taskStatusNotificationHandler);
 
 	}
 
@@ -98,7 +110,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 	@Override
 	protected Point getInitialSize() {
 		// TODO Auto-generated method stub
-		return new Point(800, 900);
+		return new Point(800, 910);
 	}
 
 	private void getServices() {
@@ -153,7 +165,6 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String serviceName = txtServiceName.getText().toString();
-				// String serviceStatus=cmbServiceStat.getText().toString();
 
 				ServiceListItem item = new ServiceListItem();
 				item.setServiceName(serviceName);
@@ -168,8 +179,6 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 					serviceList.add(item);
 
 				if (serviceList != null) {
-//					tableViewerServiceMonitor.setInput(serviceList);
-//					tableViewerServiceMonitor.refresh();
 					tableViewerServiceManage.setInput(serviceList);
 					tableViewerServiceManage.refresh();
 				}
@@ -186,15 +195,10 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 
 		tabFolder = new TabFolder(compositeServiceList, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-//		tbtmServiceMonitor = new TabItem(tabFolder, SWT.NONE);
-//		tbtmServiceMonitor.setText(Messages.getString("SERVICE_MONITOR")); //$NON-NLS-1$
-//
-//		compositeServiceListMonitor = new Composite(tabFolder, SWT.NONE);
 //		tbtmServiceMonitor.setControl(compositeServiceListMonitor);
 
 		tbtmServiceManage = new TabItem(tabFolder, SWT.NONE);
-		tbtmServiceManage.setText(Messages.getString("SERVICE_MANAGE")); //$NON-NLS-1$
+		tbtmServiceManage.setText(Messages.getString("DESIRED_SERVICE_STATE")); //$NON-NLS-1$
 
 		compositeServiceListManage = new Composite(tabFolder, SWT.NONE);
 		tbtmServiceManage.setControl(compositeServiceListManage);
@@ -254,10 +258,51 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			}
 		});
 		createServiceManageArea(compositeServiceListManage);
+		
+		btnManageService = new Button(compositeServiceListManage, SWT.NONE);
+		btnManageService.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		btnManageService.setText(Messages.getString("MANAGE_SERVICES_BTN")); 
+		
+		btnManageService.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				 Map<String, Object> parameters = getServiceParams();
+				
+				TaskRequest task = new TaskRequest(new ArrayList<String>(getDnSet()), DNType.AHENK, "service",
+						"1.0.0", "SERVICE_LIST", parameters, null, null, new Date());
+				try {
+					TaskRestUtils.execute(task);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+		});
 
 		getServices();
 
-		return null;
+		return parent;
+	}
+	
+	
+	public Map<String, Object> getServiceParams() {
+		java.util.HashMap<String, Object> parameters = new HashMap<String, Object>();
+		List<ServiceListItem> list = new ArrayList<>();
+		TableItem[] items = tableViewerServiceManage.getTable().getItems();
+		for (TableItem tableItem : items) {
+			
+			ServiceListItem listItem= (ServiceListItem) tableItem.getData();
+			
+			if(!(listItem.getDesiredServiceStatus()==DesiredStatus.NA) && !listItem.getServiceStatus().equals("NOTFOUND")){
+					ServiceListItem item = new ServiceListItem();
+					item.setServiceName(listItem.getServiceName());
+					item.setServiceStatus(listItem.getDesiredServiceStatus().toString());
+					list.add(item);
+			}
+		}
+		parameters.put(ServiceConstants.SERVICE_REQUESTS_PARAMETERS, list);
+		return parameters;
 	}
 
 	private void createServiceManageArea(Composite parent) {
@@ -459,6 +504,45 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 		
 		return "Servis Alarm";
 	}
+	
+	private EventHandler taskStatusNotificationHandler = new EventHandler() {
+		@Override
+		public void handleEvent(final Event event) {
+			Job job = new Job("TASK") {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					monitor.beginTask("SERVICE_MANAGEMENT", 100);
+					try {
+						TaskStatusNotification taskStatus = (TaskStatusNotification) event
+								.getProperty("org.eclipse.e4.data");
+						byte[] data = taskStatus.getResult().getResponseData();
+						final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
+								new TypeReference<HashMap<String, Object>>() {
+								});
+						Display.getDefault().asyncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								
+								getServices();
+								
+							}
+						});
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+						Notifier.error("", Messages.getString("UNEXPECTED_ERROR_ACCESSING_RESOURCE_USAGE"));
+					}
+					monitor.worked(100);
+					monitor.done();
+
+					return Status.OK_STATUS;
+				}
+			};
+
+			job.setUser(true);
+			job.schedule();
+		}
+	};
 
 	@Override
 	public String getMailContent() {

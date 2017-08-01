@@ -18,6 +18,8 @@
             id="tr.org.liderahenk.liderconsole.commands.ServiceListTask"            
             name="%command.task.servicelist">
       </command>
+      
+      
    </extension>
    
    <extension
@@ -30,6 +32,8 @@
             class="tr.org.liderahenk.service.handlers.ServiceListTaskHandler"
             commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask">  
       </handler>
+      
+       
   </extension>
   
   <extension
@@ -137,5 +141,4 @@
   		imagePath="services.png"/>
   	</extension>
   
-  	
 </plugin>

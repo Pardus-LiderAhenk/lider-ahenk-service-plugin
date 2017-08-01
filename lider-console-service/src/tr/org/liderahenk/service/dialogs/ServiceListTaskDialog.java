@@ -319,9 +319,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 				if (!tableItem.getText(2).equals(Messages.getString("NA"))) {// if Desired Servicestatus  exists
 					item.setServiceStatus(tableItem.getText(2).toString());
 				}
-				if (!tableItem.getText(4).equals(Messages.getString("NA"))) {// if
-																				// DesiredStartAtuo
-																				// exists
+				if (!tableItem.getText(4).equals(Messages.getString("NA"))) {// if DesiredStartAtuo exists
 					item.setStartAuto(tableItem.getText(4).toString());
 				}
 				list.add(item);
