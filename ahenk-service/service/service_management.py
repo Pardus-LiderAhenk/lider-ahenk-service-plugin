@@ -99,35 +99,48 @@ class ServiceManagement(AbstractPlugin):
             services = self.data['serviceRequestParameters']
             stopped_services = ''
 
-            result_code, p_out, p_err = self.execute("service --status-all")
+            result_code, p_out, p_err = self.execute("systemctl list-unit-files --type service")
 
             p_err = ' ' + p_err
             p_out = ' ' + p_out
             lines = p_out.split('\n')
 
             for service in services:
-                service_name = service["serviceName"]
+                service_name = service["serviceName"]+".service"
                 serviceStatus = service["serviceStatus"]
                 is_service_deleted= service["deleted"]
 
                 #service["serviceStatus"]= "exist" if self.is_service_exist(service_name) else "not_exist"
 
-                if (service_name in p_out) is False:
+                result_code, p_out, p_err = self.execute("systemctl status "+ str(service_name))
+
+                if 'not-found' in p_out :
                     service["serviceStatus"] = 'NOTFOUND'
-                else :
-                    for line in lines:
-                        line_split = line.split(' ')
 
-                        if len(line_split) >= 5:
-                            name = line_split[len(line_split) - 1]
-                            if service_name == name :
-                                if  line_split[len(line_split) - 4] == '+':
-                                    service["serviceStatus"] = "ACTIVE"
-                                elif line_split[len(line_split) - 4] == '-':
-                                    service["serviceStatus"] = 'INACTIVE'
+                elif ('inactive' in p_out) or ('failed' in p_out):
+                    service["serviceStatus"] = 'FAILED'
 
-                    if service["serviceStatus"] == 'INACTIVE' and is_service_deleted is False:
-                        stopped_services += service_name + " ,";
+                elif 'active' in p_out:
+                    service["serviceStatus"] = 'ACTIVE'
+
+                if service["serviceStatus"] == 'FAILED' and is_service_deleted is False:
+                    stopped_services += service_name + " ,";
+
+                # if (service_name in p_out) is False:
+                #     service["serviceStatus"] = 'NOTFOUND'
+                # else :
+                #     for line in lines:
+                #         line_split = line.split(' ')
+                #         if len(line_split) >= 2:
+                #             name = line_split[0]
+                #             if service_name == name :
+                #                 if  line_split[1] == 'enabled':
+                #                     service["serviceStatus"] = "ACTIVE"
+                #                 elif line_split[1] == 'disabled':
+                #                     service["serviceStatus"] = 'INACTIVE'
+                #
+                #     if service["serviceStatus"] == 'INACTIVE' and is_service_deleted is False:
+                #         stopped_services += service_name + " ,";
 
             if stopped_services != '':
                 self.send_mail(stopped_services,services)

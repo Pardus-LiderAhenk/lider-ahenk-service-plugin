@@ -35,7 +35,7 @@ class GetServices(AbstractPlugin):
 
         self.temp_file_name = str(self.generate_uuid())
         self.file_path = '{0}{1}'.format(str(self.Ahenk.received_dir_path()), self.temp_file_name)
-        self.service_status = 'service {} status'
+        self.service_status = 'systemctl status {}'
         self.isRecordExist = 0
 
     def handle_task(self):
@@ -70,61 +70,57 @@ class GetServices(AbstractPlugin):
 
     def add_file(self, name, status, auto_start):
         if self.isRecordExist == 0:
-            self.execute('echo { \\"service_list\\" :[ >> ' + self.file_path)
+            self.execute('echo { \\"agent\\" : \\"'+ self.Ahenk.dn() + '\\", \\"service_list\\" :[ >> ' + self.file_path)
             self.isRecordExist = 1
         t_command = 'echo "{ \\"serviceName\\": \\"' + name + '\\", \\"serviceStatus\\": \\"' + status + '\\", \\"startAuto\\":\\"' + auto_start + '\\"}" >> ' + self.file_path
         self.execute(t_command)
         self.execute('echo , >> ' + self.file_path)
 
+    def add_agentDnToFile(self):
+        t_command = 'echo "{ \\"agent\\": \\"' + self.Ahenk.dn() +'\\"}" >> ' + self.file_path
+        self.execute(t_command)
+        self.execute('echo , >> ' + self.file_path)
+
     def get_service_status(self):
-        (result_code, p_out, p_err) = self.execute("service --status-all")
-        self.create_file(self.file_path)
-        # service_list = ServiceList()
-        p_err = ' ' + p_err
-        p_out = ' ' + p_out
-        lines = p_out.split('\n')
-        for line in lines:
-            line_split = line.split(' ')
-            if len(line_split) >= 5:
-                proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split) - 1],
-                                        shell=True)
-                auto = "INACTIVE"
-                name = line_split[len(line_split) - 1]
+        try:
+            (result_code, p_out, p_err) = self.execute("systemctl list-units --type service --all | grep loaded")
+            self.create_file(self.file_path)
+            # service_list = ServiceList()
+            lines = p_out.split('\n')
+            for line in lines:
+                line_split = line.split(' ')
+                service=[]
+                for word in line_split:
+                    if word != '' :
+                        service.append(word)
+                if len(service)>0 and '.service' not in service[0]:
+                    del service[0]
 
-                if proc.wait() == 0:
-                    auto = "ACTIVE"
+                if len(service)>0 and '.service' in service[0]: # service[0] = service name, service[1] is loaded, service[2] active or not,
+                    result, out, err = self.execute(self.service_status.format(service[0])) # check service is enable or not on auto start
+                    auto='INACTIVE'
+                    if 'disabled' in out:
+                        auto='INACTIVE'
+                    elif 'enabled' in out:
+                        auto='ACTIVE'
 
-                result, out, err = self.execute(self.service_status.format(name))
+                    if service[2] == 'active':
+                        self.add_file(service[0], "ACTIVE", auto)
+                    else:
+                        self.add_file(service[0], 'INACTIVE',auto)
 
-                if 'Unknown job' not in str(err):
-                    if line_split[len(line_split) - 4] == '+':
-                        self.add_file(name, "ACTIVE", auto)
-                        # service_list.service_list.append(ServiceListItem(name, "ACTIVE", auto))
-                    elif line_split[len(line_split) - 4] == '-':
-                        self.add_file(name, "INACTIVE", auto)
-                        # service_list.service_list.append(ServiceListItem(name, "INACTIVE", auto))
-                else:
-                    self.logger.debug(
-                        'Service \'{0}\' has been not added to the list because of the its {1}'.format(name, err))
+                    print(service)
 
-        line_err = p_err.split(',')
 
-        for line in line_err:
-            line_split = line.split(' ')
-            if len(line_split) >= 6:
-                proc = subprocess.Popen('chkconfig --list | grep 2:on | grep ' + line_split[len(line_split) - 1],
-                                        shell=True)
-                auto = "INACTIVE"
-                if proc.wait() == 0:
-                    auto = "ACTIVE"
-                self.add_file(line_split[len(line_split) - 1], "unknown", auto)
-                # service_list.service_list.append(ServiceListItem(line_split[len(line_split)-1], "unknown", auto))
+            if self.isRecordExist == 1:
+                self.execute("sed -i '$ d' " + self.file_path)
+                self.execute('echo "]}" >> ' + self.file_path)
 
-        # result_service_list = json.dumps(service_list.__dict__, default=encode_service_object)
-        # self.logger.debug('[SERVICE]' + 'Service list: ' + str(result_service_list))
-        if self.isRecordExist == 1:
-            self.execute("sed -i '$ d' " + self.file_path)
-            self.execute('echo "]}" >> ' + self.file_path)
+        except Exception as e:
+            print(str(e))
+            self.logger.error(str(e))
+
+
 
 
 def handle_task(task, context):

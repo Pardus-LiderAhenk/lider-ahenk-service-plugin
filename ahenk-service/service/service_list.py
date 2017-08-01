@@ -16,7 +16,7 @@ class ServiceList(AbstractPlugin):
         self.message_code = self.get_message_code()
 
     def start_stop_service(self, service_name, service_action):
-        (result_code, p_out, p_err) = self.execute('service {0} {1}'.format(service_name, service_action))
+        (result_code, p_out, p_err) = self.execute('systemctl {0} {1}'.format( service_action,service_name))
         if result_code == 0:
             message = 'Service start/stop action was successful: '.format(service_action)
 
@@ -44,19 +44,19 @@ class ServiceList(AbstractPlugin):
             for item in items:
                 try:
                     if item['serviceStatus'] is not None and (
-                            str(item['serviceStatus']) == 'Başlat' or str(item['serviceStatus']) == 'Start'):
+                            str(item['serviceStatus']) == 'Başlat' or str(item['serviceStatus']) == 'Start'  or str(item['serviceStatus']) == 'START' ):
                         resultcode, message = self.start_stop_service(str(item['serviceName']), "start")
                         resultMessage += message
                     if item['serviceStatus'] is not None and (
-                            str(item['serviceStatus']) == 'Durdur' or str(item['serviceStatus']) == 'Stop'):
+                            str(item['serviceStatus']) == 'Durdur' or str(item['serviceStatus']) == 'Stop'   or str(item['serviceStatus']) == 'STOP'  ):
                         resultcode, message = self.start_stop_service(str(item['serviceName']), "stop")
                         resultMessage += message
                     if item['startAuto'] is not None and (
-                            str(item['startAuto']) == 'Başlat' or str(item['startAuto']) == 'Start'):
+                            str(item['startAuto']) == 'Başlat' or str(item['startAuto']) == 'Start' or str(item['startAuto']) == 'START'):
                         resultcode, message = self.set_startup_service(str(item['serviceName']), "defaults")
                         resultMessage += message
                     if item['startAuto'] is not None and (
-                            str(item['startAuto']) == 'Durdur' or str(item['startAuto']) == 'Stop'):
+                            str(item['startAuto']) == 'Durdur' or str(item['startAuto']) == 'Stop' or str(item['startAuto']) == 'STOP' ):
                         resultcode, message = self.set_startup_service(str(item['serviceName']), "remove")
                         resultMessage += message
 
