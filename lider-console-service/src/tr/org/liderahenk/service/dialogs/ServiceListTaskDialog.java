@@ -45,6 +45,7 @@ import tr.org.liderahenk.liderconsole.core.constants.LiderConstants;
 import tr.org.liderahenk.liderconsole.core.dialogs.DefaultTaskDialog;
 import tr.org.liderahenk.liderconsole.core.exceptions.ValidationException;
 import tr.org.liderahenk.liderconsole.core.ldap.enums.DNType;
+import tr.org.liderahenk.liderconsole.core.model.PdfContent;
 import tr.org.liderahenk.liderconsole.core.rest.requests.TaskRequest;
 import tr.org.liderahenk.liderconsole.core.rest.utils.TaskRestUtils;
 import tr.org.liderahenk.liderconsole.core.utils.SWTResourceManager;
@@ -69,7 +70,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 	private final Image inactiveImage;
 
 	public ServiceListTaskDialog(Shell parentShell, String dn) {
-		super(parentShell, dn);
+		super(parentShell, dn,false,true);
 		subscribeEventHandler(eventHandler);
 		activeImage = new Image(Display.getDefault(),
 				this.getClass().getClassLoader().getResourceAsStream("icons/16/active.png"));
@@ -410,5 +411,34 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 	@SuppressWarnings("unchecked")
 	public static <HashMap extends List<?>> HashMap cast(Object obj) {
 		return (HashMap) obj;
+	}
+	
+	
+	/**
+	 * column width number must be same column name 
+	 */
+	@Override
+	public PdfContent getPdfContent() {
+		
+		String[] columnNames={Messages.getString("SERVICE_NAME"),Messages.getString("SERVICE_STAT"),Messages.getString("START_AUTO")};
+		float[] columnWidths={1,1,1};
+		
+		List<String[]> dataList=new ArrayList<>();
+		
+		
+		for (TableItem tItem : tableViewer.getTable().getItems()) {
+			
+			ServiceListItem item=(ServiceListItem) tItem.getData();
+			
+			String[] row={item.getServiceName(),item.getServiceStatus(),item.getStartAuto()};
+			dataList.add(row);
+		} 
+		
+		tableViewer.getTable().getItems();
+		
+		PdfContent cont= new PdfContent("Servis Listesi","Servis Listesi",columnNames,columnWidths,dataList);
+		
+		return cont;
+		
 	}
 }

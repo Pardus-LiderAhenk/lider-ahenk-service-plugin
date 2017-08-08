@@ -518,7 +518,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 						byte[] data = taskStatus.getResult().getResponseData();
 						final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
 								new TypeReference<HashMap<String, Object>>() {
-								});
+								});  
 						Display.getDefault().asyncExec(new Runnable() {
 
 							@Override
