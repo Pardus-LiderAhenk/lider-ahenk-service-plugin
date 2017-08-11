@@ -430,7 +430,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			
 			ServiceListItem item=(ServiceListItem) tItem.getData();
 			
-			String[] row={item.getServiceName(),item.getServiceStatus(),item.getStartAuto()};
+			String[] row={item.getServiceName(),Messages.getString(item.getServiceStatus()),Messages.getString(item.getStartAuto())};
 			dataList.add(row);
 		} 
 		
