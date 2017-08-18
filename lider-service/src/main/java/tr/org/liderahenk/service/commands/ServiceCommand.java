@@ -51,6 +51,7 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 					if(serviceListItem.getId()==null){
 						serviceListItem.setCreateDate(new Date());
 						serviceListItem.setOwner(req.getOwner());
+						serviceListItem.setAgentDn(context.getRequest().getDnList().get(0));
 						pluginDbService.save(serviceListItem);
 						
 					}

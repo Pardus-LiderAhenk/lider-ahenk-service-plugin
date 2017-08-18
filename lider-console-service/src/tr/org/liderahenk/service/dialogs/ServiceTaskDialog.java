@@ -87,6 +87,8 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 	private Composite compositeServiceListManage;
 	private Button btnDeleteServiceManage;
 	private Button btnManageService;
+	
+	private List<String> dnList;
 
 	public ServiceTaskDialog(Shell parentShell, Set<String> dnSet) {
 		super(parentShell, dnSet,false, true, true);
@@ -99,6 +101,8 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 		deletedServiceList= new ArrayList<>();
 		
 		subscribeEventHandler(taskStatusNotificationHandler);
+		
+		dnList=new ArrayList<String>(dnSet);
 
 	}
 
@@ -115,7 +119,8 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 
 	private void getServices() {
 		try {
-			TaskRequest task = new TaskRequest(null, null, getPluginName(), getPluginVersion(), "GET_SERVICES_FROM_DB",
+			
+			TaskRequest task = new TaskRequest(dnList, DNType.AHENK, getPluginName(), getPluginVersion(), "GET_SERVICES_FROM_DB",
 					null, null, null, new Date());
 			IResponse response = TaskRestUtils.execute(task);
 			Map<String, Object> resultMap = response.getResultMap();
@@ -159,6 +164,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 		GridData gd_txtServiceName = new GridData(SWT.FILL, SWT.FILL, false, false);
 		gd_txtServiceName.widthHint = 139;
 		txtServiceName.setLayoutData(gd_txtServiceName);
+		txtServiceName.setToolTipText("Örn: ssh");
 
 		btnAddService = new Button(composite, SWT.NONE);
 		btnAddService.addSelectionListener(new SelectionAdapter() {

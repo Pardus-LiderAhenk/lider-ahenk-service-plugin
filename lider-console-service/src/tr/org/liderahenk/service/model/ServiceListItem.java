@@ -27,6 +27,8 @@ public class ServiceListItem implements Serializable {
 	
 	private String startAuto;
 	
+	private String agentDn;
+	
 	private Date createDate;
 	
 	private boolean deleted = false;
@@ -144,6 +146,14 @@ public class ServiceListItem implements Serializable {
 
 	public void setAgentId(Long agentId) {
 		this.agentId = agentId;
+	}
+
+	public String getAgentDn() {
+		return agentDn;
+	}
+
+	public void setAgentDn(String agentDn) {
+		this.agentDn = agentDn;
 	}
 
 }

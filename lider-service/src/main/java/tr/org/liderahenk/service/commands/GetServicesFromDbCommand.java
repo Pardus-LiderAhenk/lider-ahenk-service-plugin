@@ -33,6 +33,7 @@ public class GetServicesFromDbCommand implements ICommand {
 			
 			Map<String, Object> properties= new HashMap<String, Object>();
 			properties.put("owner", req.getOwner());
+			properties.put("agentDn", req.getDnList().get(0));
 			properties.put("deleted", false);
 			
 			List<ServiceListItem> services=pluginDbService.findByProperties(ServiceListItem.class, properties, null, null);

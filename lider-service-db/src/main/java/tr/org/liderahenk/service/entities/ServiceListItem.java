@@ -37,6 +37,9 @@ public class ServiceListItem implements Serializable {
 	
 	@Column(name = "AGENT_ID")
 	private Long agentId;
+	
+	@Column(name = "AGENT_DN")
+	private String agentDn;
 		
 	@Column(name = "SERVICE_NAME")
 	private String serviceName;
@@ -174,6 +177,14 @@ public class ServiceListItem implements Serializable {
 
 	public void setDesiredStartAuto(String desiredStartAuto) {
 		this.desiredStartAuto = desiredStartAuto;
+	}
+
+	public String getAgentDn() {
+		return agentDn;
+	}
+
+	public void setAgentDn(String agentDn) {
+		this.agentDn = agentDn;
 	}
 	
 	
