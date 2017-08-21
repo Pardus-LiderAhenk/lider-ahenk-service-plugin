@@ -122,7 +122,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			
 			TaskRequest task = new TaskRequest(dnList, DNType.AHENK, getPluginName(), getPluginVersion(), "GET_SERVICES_FROM_DB",
 					null, null, null, new Date());
-			IResponse response = TaskRestUtils.execute(task);
+			IResponse response = TaskRestUtils.execute(task,false);
 			Map<String, Object> resultMap = response.getResultMap();
 			ObjectMapper mapper = new ObjectMapper();
 
