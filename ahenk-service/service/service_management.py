@@ -117,11 +117,11 @@ class ServiceManagement(AbstractPlugin):
                 if 'not-found' in p_out :
                     service["serviceStatus"] = 'NOTFOUND'
 
+                elif 'running' in p_out:
+                    service["serviceStatus"] = 'ACTIVE'
+
                 elif ('inactive' in p_out) or ('failed' in p_out):
                     service["serviceStatus"] = 'FAILED'
-
-                elif 'active' in p_out:
-                    service["serviceStatus"] = 'ACTIVE'
 
                 if service["serviceStatus"] == 'FAILED' and is_service_deleted is False:
                     stopped_services += service_name + " ,";
