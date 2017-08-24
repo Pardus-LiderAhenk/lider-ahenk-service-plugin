@@ -11,7 +11,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import tr.org.liderahenk.lider.core.api.persistence.IPluginDbService;
+import tr.org.liderahenk.lider.core.api.persistence.PropertyOrder;
 import tr.org.liderahenk.lider.core.api.persistence.entities.ICommandExecutionResult;
+import tr.org.liderahenk.lider.core.api.persistence.enums.OrderType;
 import tr.org.liderahenk.lider.core.api.plugin.ICommand;
 import tr.org.liderahenk.lider.core.api.plugin.IPluginInfo;
 import tr.org.liderahenk.lider.core.api.plugin.ITaskAwareCommand;
@@ -60,6 +62,9 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 						pluginDbService.update(serviceListItem);
 					}
 				}
+				
+				parameterMap.put("serviceRequestParameters", serviceList);
+				
 			}
 			
 		} catch (Exception e) {
@@ -131,7 +136,13 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 			if(services!=null)
 				for (ServiceListItem serviceListItem : services) {
 					
-					List<ServiceListItem> serviceList= pluginDbService.findByProperty(ServiceListItem.class, "serviceName", serviceListItem.getServiceName(), 1);
+					List<PropertyOrder> orders = new ArrayList<PropertyOrder>();
+					orders.add(new PropertyOrder("createDate", OrderType.DESC));
+					
+					HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
+					propertiesMap.put("id", serviceListItem.getId());
+					
+					List<ServiceListItem> serviceList= pluginDbService.findByProperties(ServiceListItem.class,propertiesMap,orders, 1);
 					if(serviceList!=null && serviceList.size()>0){
 						ServiceListItem service= serviceList.get(0);
 						service.setAgentId(result.getAgentId());
