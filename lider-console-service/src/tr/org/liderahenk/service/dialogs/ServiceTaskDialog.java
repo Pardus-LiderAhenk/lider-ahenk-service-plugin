@@ -3,6 +3,7 @@ package tr.org.liderahenk.service.dialogs;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 	private List<String> dnList;
 
 	public ServiceTaskDialog(Shell parentShell, Set<String> dnSet) {
-		super(parentShell, dnSet,false, true, true);
+		super(parentShell, dnSet,false, true);
 		activeImage = new Image(Display.getDefault(),
 				this.getClass().getClassLoader().getResourceAsStream("icons/16/active.png"));
 		inactiveImage = new Image(Display.getDefault(),
@@ -193,7 +194,17 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 		});
 		btnAddService.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		btnAddService.setText(Messages.getString("ADD_SERVICE_BTN"));
-		new Label(composite, SWT.NONE);
+		
+		btnRefresh = new Button(composite, SWT.NONE);
+		btnRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				getServices();
+			}
+		});
+		btnRefresh.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnRefresh.setText(Messages.getString("refresh_services")); //$NON-NLS-1$
 
 		compositeServiceList = new Composite(composite, SWT.NONE);
 		compositeServiceList.setLayout(new GridLayout(1, false));
@@ -304,6 +315,11 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 					ServiceListItem item = new ServiceListItem();
 					item.setServiceName(listItem.getServiceName());
 					item.setServiceStatus(listItem.getDesiredServiceStatus().toString());
+					item.setAgentDn(listItem.getAgentDn());
+					item.setAgentId(listItem.getAgentId());
+					item.setId(listItem.getId());
+					item.setServiceMonitoring(listItem.isServiceMonitoring());
+					
 					list.add(item);
 			}
 		}
@@ -525,10 +541,28 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 						final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
 								new TypeReference<HashMap<String, Object>>() {
 								});  
+						
+						Object services= responseData.get("service_list");
+						if(services!=null && services instanceof ArrayList){
+							
+							ArrayList<LinkedHashMap> serviceArrayList= (ArrayList<LinkedHashMap>) services;
+							
+							for(LinkedHashMap service : serviceArrayList){
+								
+								String serviceName=(String) service.get("serviceName");
+								String serviceStatus=(String) service.get("serviceStatus");
+								
+							}
+						}
+						
+						
+						System.out.println("");
 						Display.getDefault().asyncExec(new Runnable() {
 
 							@Override
 							public void run() {
+								
+								
 								
 								getServices();
 								
@@ -549,6 +583,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			job.schedule();
 		}
 	};
+	private Button btnRefresh;
 
 	@Override
 	public String getMailContent() {

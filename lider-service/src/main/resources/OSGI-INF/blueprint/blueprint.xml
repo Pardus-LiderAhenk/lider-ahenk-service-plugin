@@ -34,10 +34,19 @@
 		<property name="pluginInfo" ref="pluginInfoImpl" />
 	</bean>
 	<!-- ICommand implementation is used to process a task execution -->
-	<service ref="ServiceListCommand" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
+	<service ref="ServiceListCommand">
+	<interfaces>
+			<value>tr.org.liderahenk.lider.core.api.plugin.ICommand</value>
+			<value>tr.org.liderahenk.lider.core.api.plugin.ITaskAwareCommand</value>
+		</interfaces>
+	</service>
+	
+	
+	
 	<bean id="ServiceListCommand" class="tr.org.liderahenk.service.commands.ServiceListCommand">
 		<property name="resultFactory" ref="resultFactory" />
 		<property name="pluginInfo" ref="pluginInfoImpl" />
+		<property name="pluginDbService" ref="pluginDbService" />
 	</bean>
 
 	<!-- ICommand implementation is used to process a task execution -->
