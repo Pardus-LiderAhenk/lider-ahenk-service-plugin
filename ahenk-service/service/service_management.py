@@ -115,15 +115,15 @@ class ServiceManagement(AbstractPlugin):
                 result_code, p_out, p_err = self.execute("systemctl status "+ str(service_name))
 
                 if 'not-found' in p_out :
-                    service["serviceStatus"] = 'NOTFOUND'
+                    service["serviceStatus"] = 'Service Not Found'
 
                 elif 'running' in p_out:
-                    service["serviceStatus"] = 'ACTIVE'
+                    service["serviceStatus"] = 'Running'
 
                 elif ('inactive' in p_out) or ('failed' in p_out):
-                    service["serviceStatus"] = 'FAILED'
+                    service["serviceStatus"] = 'Stopped'
 
-                if service["serviceStatus"] == 'FAILED' and is_service_deleted is False:
+                if service["serviceStatus"] == 'Stopped' and is_service_deleted is False:
                     stopped_services += service_name + " ,";
 
                 # if (service_name in p_out) is False:
