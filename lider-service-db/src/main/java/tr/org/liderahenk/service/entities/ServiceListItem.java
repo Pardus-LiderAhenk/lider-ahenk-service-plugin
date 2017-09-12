@@ -47,6 +47,9 @@ public class ServiceListItem implements Serializable {
 	@Column(name = "STATUS")
 	private String serviceStatus;
 	
+	@Column(name = "TASK_ID")
+	private Long taskId;
+	
 	@Column(name = "DELETED")
 	private boolean deleted = false;
 	
@@ -58,6 +61,8 @@ public class ServiceListItem implements Serializable {
 	
 	@Column(name = "DESIRED_START_AUTO")
 	private String desiredStartAuto;
+	
+	
 	
 	@Transient
 	private boolean updated = false;
@@ -185,6 +190,14 @@ public class ServiceListItem implements Serializable {
 
 	public void setAgentDn(String agentDn) {
 		this.agentDn = agentDn;
+	}
+
+	public Long getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(Long taskId) {
+		this.taskId = taskId;
 	}
 	
 	

@@ -61,6 +61,10 @@
 		<property name="resultFactory" ref="resultFactory" />
 		<property name="pluginInfo" ref="pluginInfoImpl" />
 		<property name="pluginDbService" ref="pluginDbService" />
+		<property name="taskDao" ref="taskDao" />
+		<property name="messagingService" ref="messagingService" />
+		<property name="messageFactory" ref="messageFactory" />
+		<property name="commandDao" ref="commandDao" />
 	</bean>
 
 
@@ -69,6 +73,7 @@
 	<bean id="GetServices" class="tr.org.liderahenk.service.commands.GetServicesFromDbCommand">
 		<property name="resultFactory" ref="resultFactory" />
 		<property name="pluginInfo" ref="pluginInfoImpl" />
+		<property name="taskDao" ref="taskDao" />
 		<property name="pluginDbService" ref="pluginDbService" />
 	</bean>
 
@@ -77,4 +82,13 @@
 	<reference id="pluginDbService" interface="tr.org.liderahenk.lider.core.api.persistence.IPluginDbService" />
 	
 	<reference id="logService" interface="tr.org.liderahenk.lider.core.api.log.IOperationLogService" />
+	
+	<reference id="taskDao" interface="tr.org.liderahenk.lider.core.api.persistence.dao.ITaskDao" />
+	
+	<reference id="messagingService" interface="tr.org.liderahenk.lider.core.api.messaging.IMessagingService" />
+	
+	<reference id="commandDao"	interface="tr.org.liderahenk.lider.core.api.persistence.dao.ICommandDao" />
+	
+	<reference id="messageFactory"		interface="tr.org.liderahenk.lider.core.api.messaging.IMessageFactory" />
+	
 </blueprint>

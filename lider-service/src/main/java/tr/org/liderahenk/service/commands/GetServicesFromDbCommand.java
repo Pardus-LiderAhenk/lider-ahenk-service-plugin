@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import tr.org.liderahenk.lider.core.api.persistence.IPluginDbService;
+import tr.org.liderahenk.lider.core.api.persistence.dao.ITaskDao;
+import tr.org.liderahenk.lider.core.api.persistence.entities.ITask;
 import tr.org.liderahenk.lider.core.api.plugin.ICommand;
 import tr.org.liderahenk.lider.core.api.plugin.IPluginInfo;
 import tr.org.liderahenk.lider.core.api.rest.requests.ITaskRequest;
@@ -19,6 +21,8 @@ public class GetServicesFromDbCommand implements ICommand {
 
 	private ICommandResultFactory resultFactory;
 	private IPluginInfo pluginInfo;
+	private ITaskDao taskDao;
+	
 
 	private IPluginDbService pluginDbService;
 
@@ -36,14 +40,29 @@ public class GetServicesFromDbCommand implements ICommand {
 			properties.put("agentDn", req.getDnList().get(0));
 			properties.put("deleted", false);
 			
-			List<ServiceListItem> services=pluginDbService.findByProperties(ServiceListItem.class, properties, null, null);
+			List<ServiceListItem> servicesFromDB=pluginDbService.findByProperties(ServiceListItem.class, properties, null, null);
+			
+			
+			for (ServiceListItem serviceListItem : servicesFromDB) {
+				
+				long taskId= serviceListItem.getTaskId();
+				
+				ITask task= taskDao.find(taskId);
+				
+				if(!task.isDeleted()){
+					
+					serviceListItem.setServiceMonitoring(false);
+					servicesFromDB.add(serviceListItem);
+				}
+				
+			}
 			
 			resultMessages = new ArrayList<String>();
 			resultMessages.add("İşlem Başarılı");
 			
 			resultMap = new HashMap<String, Object>();
 			
-			resultMap.put("serviceList", services);
+			resultMap.put("serviceList", servicesFromDB);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return resultFactory.create(CommandResultStatus.ERROR, new ArrayList<String>(), this);
@@ -92,6 +111,14 @@ public class GetServicesFromDbCommand implements ICommand {
 
 	public void setPluginDbService(IPluginDbService pluginDbService) {
 		this.pluginDbService = pluginDbService;
+	}
+
+	public ITaskDao getTaskDao() {
+		return taskDao;
+	}
+
+	public void setTaskDao(ITaskDao taskDao) {
+		this.taskDao = taskDao;
 	}
 	
 }

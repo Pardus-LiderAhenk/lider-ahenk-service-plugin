@@ -9,10 +9,17 @@ import java.util.Map;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import tr.org.liderahenk.lider.core.api.messaging.IMessageFactory;
+import tr.org.liderahenk.lider.core.api.messaging.IMessagingService;
 import tr.org.liderahenk.lider.core.api.persistence.IPluginDbService;
 import tr.org.liderahenk.lider.core.api.persistence.PropertyOrder;
+import tr.org.liderahenk.lider.core.api.persistence.dao.ICommandDao;
+import tr.org.liderahenk.lider.core.api.persistence.dao.ITaskDao;
 import tr.org.liderahenk.lider.core.api.persistence.entities.ICommandExecutionResult;
+import tr.org.liderahenk.lider.core.api.persistence.entities.ITask;
 import tr.org.liderahenk.lider.core.api.persistence.enums.OrderType;
 import tr.org.liderahenk.lider.core.api.plugin.ICommand;
 import tr.org.liderahenk.lider.core.api.plugin.IPluginInfo;
@@ -26,16 +33,81 @@ import tr.org.liderahenk.service.entities.ServiceListItem;
 
 public class ServiceCommand implements ICommand, ITaskAwareCommand {
 
+	private static Logger logger = LoggerFactory.getLogger(ServiceCommand.class);
+	
 	private ICommandResultFactory resultFactory;
 	private IPluginInfo pluginInfo;
 
 	private IPluginDbService pluginDbService;
+	private IMessagingService messagingService;
+	private IMessageFactory messageFactory;
+	private ITaskDao taskDao;
+	private ICommandDao commandDao;
+	
 
 	@Override
 	public ICommandResult execute(ICommandContext context) {
 		
+		logger.info("ServiceCommand executing");
+		
 		 ITaskRequest req = context.getRequest();
 	
+		 String cronExpression = req.getCronExpression();
+		 
+		 
+		 /**
+		  * delete all service cron tasks and update agents cron jobs..
+		  */
+		 if(cronExpression !=null){
+			 
+			 logger.info("Service command has cron expression Cron: "+ cronExpression);
+			 Map<String, Object> propertiesMap= new HashMap<String, Object>();
+			 propertiesMap.put("commandClsId", req.getCommandId());
+			 propertiesMap.put("deleted", false);
+			 
+			List<? extends ITask> returns = taskDao.findByProperties(ITask.class, propertiesMap, null, null);
+			
+			if(returns!=null && returns.size()>0){
+			 
+				for (ITask iTask : returns) {
+					
+					if(iTask.getCommandClsId()!=null){
+						
+						if(iTask.getCronExpression()!=null){
+							logger.info("Deleting all service manager tasks : Task CMD ID:  "+req.getCommandId());
+							
+								List<? extends tr.org.liderahenk.lider.core.api.persistence.entities.ICommand> resultList 
+								= commandDao.findByProperty(tr.org.liderahenk.lider.core.api.persistence.entities.ICommand .class, "task.id", iTask.getId(), 1);
+										
+								if(resultList!=null && resultList.size()>0){
+									
+									tr.org.liderahenk.lider.core.api.persistence.entities.ICommand command = resultList.get(0);
+											
+									
+									List<String> uidList = command.getUidList();
+									
+									if (uidList != null) {
+										for (String uid : uidList) {
+											
+											logger.info("Updateting scheduler task uid:  "+uid);
+											
+											try {
+												messagingService.sendMessage(messageFactory.createUpdateScheduledTaskMessage(uid, iTask.getId(), null));
+											} catch (Exception e) {
+												logger.error(e.getMessage(), e);
+											}
+										}                                                  
+										
+										taskDao.delete(iTask.getId());
+									}
+								}
+						}
+					}
+				}
+			}
+			 
+		 }
+		 
 		 Map<String, Object> parameterMap = req.getParameterMap();
 		 
 		 ObjectMapper mapper = new ObjectMapper();
@@ -120,6 +192,8 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 	public void onTaskUpdate(ICommandExecutionResult result) {
 
 		try {
+			
+			long taskId= result.getCommandExecution().getCommand().getTask().getId();
 
 			byte[] data = result.getResponseData();
 			
@@ -150,7 +224,11 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 						service.setDesiredServiceStatus(serviceListItem.getDesiredServiceStatus());
 						service.setDesiredStartAuto(serviceListItem.getDesiredStartAuto());
 						service.setStartAuto(serviceListItem.getStartAuto());
+						
+						
 						service.setServiceStatus(serviceListItem.getServiceStatus());
+						
+						service.setTaskId(taskId);
 						
 						service.setModifyDate(new Date());
 						service.setServiceMonitoring(true);
@@ -165,5 +243,37 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 	
 		
 	}
-	
+
+	public ITaskDao getTaskDao() {
+		return taskDao;
+	}
+
+	public void setTaskDao(ITaskDao taskDao) {
+		this.taskDao = taskDao;
+	}
+
+	public IMessagingService getMessagingService() {
+		return messagingService;
+	}
+
+	public void setMessagingService(IMessagingService messagingService) {
+		this.messagingService = messagingService;
+	}
+
+	public IMessageFactory getMessageFactory() {
+		return messageFactory;
+	}
+
+	public void setMessageFactory(IMessageFactory messageFactory) {
+		this.messageFactory = messageFactory;
+	}
+
+	public ICommandDao getCommandDao() {
+		return commandDao;
+	}
+
+	public void setCommandDao(ICommandDao commandDao) {
+		this.commandDao = commandDao;
+	}
+
 }
