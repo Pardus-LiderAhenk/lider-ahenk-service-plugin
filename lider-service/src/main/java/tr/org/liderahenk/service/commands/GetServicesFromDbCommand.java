@@ -42,17 +42,16 @@ public class GetServicesFromDbCommand implements ICommand {
 			
 			List<ServiceListItem> servicesFromDB=pluginDbService.findByProperties(ServiceListItem.class, properties, null, null);
 			
-			
 			for (ServiceListItem serviceListItem : servicesFromDB) {
 				
 				long taskId= serviceListItem.getTaskId();
 				
 				ITask task= taskDao.find(taskId);
 				
-				if(!task.isDeleted()){
+				if(task.isDeleted()){
 					
 					serviceListItem.setServiceMonitoring(false);
-					servicesFromDB.add(serviceListItem);
+					serviceListItem.setServiceStatus("");
 				}
 				
 			}
