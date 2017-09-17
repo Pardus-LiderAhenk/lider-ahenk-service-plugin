@@ -47,9 +47,7 @@ public class GetServicesFromDbCommand implements ICommand {
 				long taskId= serviceListItem.getTaskId();
 				
 				ITask task= taskDao.find(taskId);
-				
-				if(task.isDeleted()){
-					
+				if (task.isDeleted() == true){
 					serviceListItem.setServiceMonitoring(false);
 					serviceListItem.setServiceStatus("");
 				}
