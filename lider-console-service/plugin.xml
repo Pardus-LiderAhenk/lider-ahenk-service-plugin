@@ -125,7 +125,7 @@
   	
   	<extension
   		point="tr.org.liderahenk.liderconsole.core.taskmenu">
-  		<taskItem label="%command.task" pluginName="service" 
+  		<taskItem label="%command.manage.services.task" pluginName="service" 
   		pluginVersion="1.0.0" 
   		taskCommandId="tr.org.liderahenk.liderconsole.commands.ServiceTask" selectionType="multi" 
   		description="Ahenk makine/leri için çalıştırılan bu eklenti, makine üzerinde bulunan servisleri yönetmek için kullanılır.&#xA;Servis yönetimi için tıklayınız.." 
