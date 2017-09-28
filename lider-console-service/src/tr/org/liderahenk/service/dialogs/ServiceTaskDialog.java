@@ -287,7 +287,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 
 				Map<String, Object> parameters = getServiceParams();
 
-				TaskRequest task = new TaskRequest(new ArrayList<String>(getDnSet()), DNType.AHENK, "service", "1.0.0",
+				TaskRequest task = new TaskRequest(new ArrayList<String>(getDnSet()), DNType.AHENK, getPluginName(), getPluginVersion(),
 						"SERVICE_LIST", parameters, null, null, new Date());
 				try {
 					TaskRestUtils.execute(task);
