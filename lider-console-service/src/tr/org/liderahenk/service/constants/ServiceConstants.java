@@ -13,4 +13,7 @@ public class ServiceConstants {
 	}
 	public static final String SERVICE_REQUESTS_PARAMETERS = "serviceRequestParameters";
 	
+	public static final String LIDER_SERVICEREPORTONLINEUSER_EDITOR = "tr.org.liderahenk.service.editors.ServiceReportOnlineAhenkEditor";
+
+	
 }

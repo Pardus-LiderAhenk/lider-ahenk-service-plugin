@@ -19,6 +19,12 @@
             name="%command.task.servicelist">
       </command>
       
+       <command
+            categoryId="tr.org.liderahenk.liderconsole.commands.category"
+            id="tr.org.liderahenk.liderconsole.commands.ServiceReportOnlineAhenk"
+            name="%command.servicereport.onlineahenk">
+      </command>
+      
       
    </extension>
    
@@ -31,6 +37,11 @@
        <handler
             class="tr.org.liderahenk.service.handlers.ServiceListTaskHandler"
             commandId="tr.org.liderahenk.liderconsole.commands.ServiceListTask">  
+      </handler>
+      
+       <handler
+            class="tr.org.liderahenk.service.handlers.ServiceReportOnlineAhenkHandler"
+            commandId="tr.org.liderahenk.liderconsole.commands.ServiceReportOnlineAhenk">
       </handler>
       
        
@@ -110,6 +121,21 @@
 					</visibleWhen>
            		</command>
 		</menuContribution>
+		
+		
+		
+		<menuContribution
+            locationURI="menu:tr.org.liderahenk.liderconsole.menus.LiderMain?after=additions">
+  		<command
+           	  commandId="tr.org.liderahenk.liderconsole.commands.ServiceReportOnlineAhenk"
+	          id="tr.org.liderahenk.liderconsole.commands.ServiceReportOnlineAhenk"
+	          icon="icons/16/services.png"
+	          tooltip="%command.servicereport.onlineahenk">
+        </command>
+  		
+    </menuContribution>
+		
+		
   </extension>
   
 	<!-- Add extension point contribution for i18n messages -->
@@ -140,5 +166,16 @@
   		description="Ahenk makinesi üzerinde varolan tm servislerin durumu listelemek ve yönetmek için kullanılır.&#xA;Servis listesi için tıklayınız.."
   		imagePath="services.png"/>
   	</extension>
+  	
+  	 	<!-- EDITORS -->
+	<extension
+		point="org.eclipse.ui.editors">
+		<editor
+		    class="tr.org.liderahenk.service.editors.ServiceReportOnlineAhenkEditor"
+		    icon="icons/16/services.png"
+		    id="tr.org.liderahenk.service.editors.ServiceReportOnlineAhenkEditor"
+		    name="%command.servicereport.onlineahenk">
+	    </editor> 		
+	</extension>
   
 </plugin>

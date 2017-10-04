@@ -434,8 +434,6 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 			dataList.add(row);
 		} 
 		
-		tableViewer.getTable().getItems();
-		
 		PdfContent cont= new PdfContent("Servis Listesi","Servis Listesi",columnNames,columnWidths,dataList);
 		
 		return cont;
