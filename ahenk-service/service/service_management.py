@@ -96,7 +96,15 @@ class ServiceManagement(AbstractPlugin):
     def handle_task(self):
         try:
             self.logger.debug("Service Management task is started.")
-            services = self.data['serviceRequestParameters']
+            servicesAll = self.data['serviceRequestParameters']
+
+            services = []
+
+            for srvc in servicesAll :
+                if srvc["agentDn"] == self.Ahenk.dn():
+                    services.append(srvc)
+
+
             stopped_services = ''
 
             result_code, p_out, p_err = self.execute("systemctl list-unit-files --type service")
