@@ -11,6 +11,7 @@ public class ServiceListItem implements Serializable {
 	private static final long serialVersionUID = -6960172599451368434L;
 	
 	private Long id;
+	
 	private String serviceName;
 	
 	private String owner;

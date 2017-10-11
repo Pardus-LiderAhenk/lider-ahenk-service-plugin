@@ -52,7 +52,51 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 		
 		 ITaskRequest req = context.getRequest();
 	
-		 String cronExpression = req.getCronExpression();
+		 deleteAllCronTasks(req);
+		 
+		 Map<String, Object> parameterMap = req.getParameterMap();
+		 
+		 ObjectMapper mapper = new ObjectMapper();
+		 mapper.configure(
+				    DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		 try {
+			List<ServiceListItem> serviceList = mapper.readValue(mapper.writeValueAsString(parameterMap.get("serviceRequestParameters")),
+						new TypeReference<List<ServiceListItem>>() {
+				});
+			
+			if(serviceList!=null && serviceList.size()>0){
+				for (ServiceListItem serviceListItem : serviceList) {
+					
+					if(serviceListItem.getId()==null){
+						serviceListItem.setCreateDate(new Date());
+						serviceListItem.setOwner(req.getOwner());
+						pluginDbService.save(serviceListItem);
+						
+					}
+					if(serviceListItem.isUpdated() || serviceListItem.isDeleted()){
+						serviceListItem.setModifyDate(new Date());
+						pluginDbService.update(serviceListItem);
+					}
+				}
+				
+				parameterMap.put("serviceRequestParameters", serviceList);
+				
+			}
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+			return resultFactory.create(CommandResultStatus.ERROR, new ArrayList<String>(), this);
+		} 
+		return resultFactory.create(CommandResultStatus.OK, new ArrayList<String>(), this);
+	}
+
+	
+	
+	
+	private void deleteAllCronTasks(ITaskRequest req) {
+		String cronExpression = req.getCronExpression();
 		 
 		 
 		 /**
@@ -107,44 +151,6 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 			}
 			 
 		 }
-		 
-		 Map<String, Object> parameterMap = req.getParameterMap();
-		 
-		 ObjectMapper mapper = new ObjectMapper();
-		 mapper.configure(
-				    DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-		 try {
-			List<ServiceListItem> serviceList = mapper.readValue(mapper.writeValueAsString(parameterMap.get("serviceRequestParameters")),
-						new TypeReference<List<ServiceListItem>>() {
-				});
-			
-			if(serviceList!=null && serviceList.size()>0){
-				for (ServiceListItem serviceListItem : serviceList) {
-					
-					if(serviceListItem.getId()==null){
-						serviceListItem.setCreateDate(new Date());
-						serviceListItem.setOwner(req.getOwner());
-						serviceListItem.setAgentDn(context.getRequest().getDnList().get(0));
-						pluginDbService.save(serviceListItem);
-						
-					}
-					if(serviceListItem.isUpdated() || serviceListItem.isDeleted()){
-						serviceListItem.setModifyDate(new Date());
-						pluginDbService.update(serviceListItem);
-					}
-				}
-				
-				parameterMap.put("serviceRequestParameters", serviceList);
-				
-			}
-			
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-			return resultFactory.create(CommandResultStatus.ERROR, new ArrayList<String>(), this);
-		} 
-		return resultFactory.create(CommandResultStatus.OK, new ArrayList<String>(), this);
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 
 	private Label lblServiceName;
 	private Text txtServiceName;
-	private static final String[] serviceStatArray = new String[] { "NA", "Start", "Stop" };
+//	private static final String[] serviceStatArray = new String[] { "NA", "Start", "Stop" };
 	private Composite compositeServiceList;
 	// private TableViewer tableViewerServiceMonitor;
 	private TableViewer tableViewerServiceManage;
@@ -84,6 +84,10 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 	private Button btnManageService;
 
 	private List<String> dnList;
+
+	private Button btnStartAll;
+
+	private Button btnStopAll;
 
 	public ServiceTaskDialog(Shell parentShell, Set<String> dnSet) {
 		super(parentShell, dnSet, false, true);
@@ -109,7 +113,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 	@Override
 	protected Point getInitialSize() {
 		// TODO Auto-generated method stub
-		return new Point(800, 910);
+		return new Point(990, 910);
 	}
 
 	private void getServices() {
@@ -123,8 +127,7 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			if (resultMap != null) {
 				List<ServiceListItem> services = mapper.readValue(
 						mapper.writeValueAsString(resultMap.get("serviceList")),
-						new TypeReference<List<ServiceListItem>>() {
-						});
+						new TypeReference<List<ServiceListItem>>() {});
 
 				if (services != null) {
 					serviceList = services;
@@ -132,12 +135,10 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 						tableViewerServiceManage.setInput(serviceList);
 						tableViewerServiceManage.refresh();
 					}
-
 					// tableViewerServiceMonitor.setInput(serviceList);
 					// tableViewerServiceMonitor.refresh();
 				}
 			}
-
 		} catch (Exception e) {
 			Notifier.error(null, Messages.getString("ERROR_ON_LIST"));
 			e.printStackTrace();
@@ -170,18 +171,25 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String serviceName = txtServiceName.getText().toString();
+				
+				
+				for (int i = 0; i < dnList.size(); i++) {
+					
+					ServiceListItem item = new ServiceListItem();
+					item.setServiceName(serviceName);
+					item.setAgentDn(dnList.get(i));
+					item.setDesiredServiceStatus(DesiredStatus.NA);
+					
+					
+					boolean isExist = false;
+					for (ServiceListItem serviceListItem : serviceList) {
+						if (serviceListItem.getServiceName().equals(serviceName) && serviceListItem.getAgentDn().equals(dnList.get(i)))
+							isExist = true;
+					}
 
-				ServiceListItem item = new ServiceListItem();
-				item.setServiceName(serviceName);
-				item.setDesiredServiceStatus(DesiredStatus.NA);
-				boolean isExist = false;
-				for (ServiceListItem serviceListItem : serviceList) {
-					if (serviceListItem.getServiceName().equals(serviceName))
-						isExist = true;
+					if (!isExist)
+						serviceList.add(item);
 				}
-
-				if (!isExist)
-					serviceList.add(item);
 
 				if (serviceList != null) {
 					tableViewerServiceManage.setInput(serviceList);
@@ -248,8 +256,68 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 		//
 		// createServiceMonitorArea(compositeServiceListMonitor);
 
-		compositeServiceListManage.setLayout(new GridLayout(1, false));
+		compositeServiceListManage.setLayout(new GridLayout(3, false));
 		compositeServiceListManage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+		
+		
+		
+		btnStartAll = new Button(compositeServiceListManage, SWT.NONE);
+		btnStartAll.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnStartAll.setText(Messages.getString("START_ALL"));
+		
+				btnStartAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+		
+						TableItem[] items = tableViewerServiceManage.getTable().getItems();
+						if (items.length > 0) {
+							
+							for (TableItem tableItem : items) {
+								
+								ServiceListItem item = (ServiceListItem) tableItem.getData();
+								item.setDesiredServiceStatus(DesiredStatus.START);
+								
+							}
+							
+							if (serviceList != null) {
+								tableViewerServiceManage.setInput(serviceList);
+								tableViewerServiceManage.refresh();
+							}
+							
+						}
+		
+					}
+				});
+		
+		btnStopAll = new Button(compositeServiceListManage, SWT.NONE);
+		btnStopAll.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnStopAll.setText(Messages.getString("STOP_ALL"));
+		
+				btnStopAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+		
+						TableItem[] items = tableViewerServiceManage.getTable().getItems();
+						if (items.length > 0) {
+							
+							for (TableItem tableItem : items) {
+								
+								ServiceListItem item = (ServiceListItem) tableItem.getData();
+								item.setDesiredServiceStatus(DesiredStatus.STOP);
+								
+							}
+							
+							if (serviceList != null) {
+								tableViewerServiceManage.setInput(serviceList);
+								tableViewerServiceManage.refresh();
+							}
+							
+						}
+		
+					}
+				});
+		
+		
 
 		btnDeleteServiceManage = new Button(compositeServiceListManage, SWT.NONE);
 		btnDeleteServiceManage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
@@ -276,6 +344,8 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			}
 		});
 		createServiceManageArea(compositeServiceListManage);
+		new Label(compositeServiceListManage, SWT.NONE);
+		new Label(compositeServiceListManage, SWT.NONE);
 
 		btnManageService = new Button(compositeServiceListManage, SWT.NONE);
 		btnManageService.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
@@ -312,7 +382,8 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 			ServiceListItem listItem = (ServiceListItem) tableItem.getData();
 
 			if (!(listItem.getDesiredServiceStatus() == DesiredStatus.NA)
-					&& !listItem.getServiceStatus().equals("NOTFOUND")) {
+					) 
+			{
 				ServiceListItem item = new ServiceListItem();
 				item.setServiceName(listItem.getServiceName());
 				item.setServiceStatus(listItem.getDesiredServiceStatus().toString());
@@ -424,9 +495,14 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 	// }
 
 	private void createServiceManageTableColumns() {
+		
+		
+		
+		
+		
 		// Service name
 		TableViewerColumn serviceNameColumn = SWTResourceManager.createTableViewerColumn(tableViewerServiceManage,
-				Messages.getString("SERVICE_NAME"), 200);
+				Messages.getString("SERVICE_NAME"), 100);
 		serviceNameColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -436,6 +512,22 @@ public class ServiceTaskDialog extends DefaultTaskDialog {
 				return Messages.getString("UNTITLED");
 			}
 		});
+		
+		
+		
+		TableViewerColumn ahenkDnColumn = SWTResourceManager.createTableViewerColumn(tableViewerServiceManage,
+				Messages.getString("agent"), 300);
+		ahenkDnColumn.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if (element instanceof ServiceListItem) {
+					return ((ServiceListItem) element).getAgentDn();
+				}
+				return Messages.getString("UNTITLED");
+			}
+		});
+		
+		
 		TableViewerColumn serviceMonitorStatusColumn = SWTResourceManager
 				.createTableViewerColumn(tableViewerServiceManage, Messages.getString("SERVICE_MONITOR"), 180);
 		serviceMonitorStatusColumn.setLabelProvider(new ColumnLabelProvider() {

@@ -23,7 +23,6 @@ public class GetServicesFromDbCommand implements ICommand {
 	private IPluginInfo pluginInfo;
 	private ITaskDao taskDao;
 	
-
 	private IPluginDbService pluginDbService;
 
 	@Override
@@ -37,21 +36,32 @@ public class GetServicesFromDbCommand implements ICommand {
 			
 			Map<String, Object> properties= new HashMap<String, Object>();
 			properties.put("owner", req.getOwner());
-			properties.put("agentDn", req.getDnList().get(0));
+		//	properties.put("agentDn", req.getDnList());
 			properties.put("deleted", false);
 			
 			List<ServiceListItem> servicesFromDB=pluginDbService.findByProperties(ServiceListItem.class, properties, null, null);
 			
+			List<String>  dnList= req.getDnList();
+			
+			List<ServiceListItem> resultList=new ArrayList<ServiceListItem>();
+			
 			for (ServiceListItem serviceListItem : servicesFromDB) {
 				
-				long taskId= serviceListItem.getTaskId();
-				
-				ITask task= taskDao.find(taskId);
-				if (task.isDeleted() == true){
-					serviceListItem.setServiceMonitoring(false);
-					serviceListItem.setServiceStatus("");
+				for (String dn : dnList) {
+					if(dn.equals(serviceListItem.getAgentDn()))
+					{
+						if(serviceListItem.getTaskId()!=null){
+							long taskId= serviceListItem.getTaskId();
+							
+							ITask task= taskDao.find(taskId);
+							if (task.isDeleted() == true){
+								serviceListItem.setServiceMonitoring(false);
+								serviceListItem.setServiceStatus("");
+							}
+						}
+						resultList.add(serviceListItem);
+					}
 				}
-				
 			}
 			
 			resultMessages = new ArrayList<String>();
@@ -59,7 +69,7 @@ public class GetServicesFromDbCommand implements ICommand {
 			
 			resultMap = new HashMap<String, Object>();
 			
-			resultMap.put("serviceList", servicesFromDB);
+			resultMap.put("serviceList", resultList);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return resultFactory.create(CommandResultStatus.ERROR, new ArrayList<String>(), this);

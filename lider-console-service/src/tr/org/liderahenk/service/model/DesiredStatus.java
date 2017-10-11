@@ -3,7 +3,7 @@ package tr.org.liderahenk.service.model;
 import tr.org.liderahenk.service.i18n.Messages;
 
 public enum DesiredStatus {
-	START, STOP, RESTART, NA;
+	START, STOP, NA;
 
 	/**
 	 * Provide i18n message representation of the enum type.
