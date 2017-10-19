@@ -14,7 +14,7 @@ public class ServiceListItem implements Serializable {
 	
 	private String serviceName;
 	
-	private String owner;
+//	private String owner;
 
 	private DesiredStatus desiredServiceStatus;
 	
@@ -24,13 +24,15 @@ public class ServiceListItem implements Serializable {
 	
 	private String serviceStatus;
 	
-	private Long agentId;
+//	private Long agentId;
 	
 	private String startAuto;
 	
-	private Long taskId;
+//	private Long taskId;
 	
 	private String agentDn;
+	
+//	private String agentUid;
 	
 	private Date createDate;
 	
@@ -111,13 +113,13 @@ public class ServiceListItem implements Serializable {
 		this.id = id;
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+//	public String getOwner() {
+//		return owner;
+//	}
+//
+//	public void setOwner(String owner) {
+//		this.owner = owner;
+//	}
 
 	public boolean isDeleted() {
 		return deleted;
@@ -143,13 +145,13 @@ public class ServiceListItem implements Serializable {
 		this.isServiceMonitoring = isServiceMonitoring;
 	}
 
-	public Long getAgentId() {
-		return agentId;
-	}
-
-	public void setAgentId(Long agentId) {
-		this.agentId = agentId;
-	}
+//	public Long getAgentId() {
+//		return agentId;
+//	}
+//
+//	public void setAgentId(Long agentId) {
+//		this.agentId = agentId;
+//	}
 
 	public String getAgentDn() {
 		return agentDn;
@@ -159,12 +161,20 @@ public class ServiceListItem implements Serializable {
 		this.agentDn = agentDn;
 	}
 
-	public Long getTaskId() {
-		return taskId;
-	}
-
-	public void setTaskId(Long taskId) {
-		this.taskId = taskId;
-	}
+//	public Long getTaskId() {
+//		return taskId;
+//	}
+//
+//	public void setTaskId(Long taskId) {
+//		this.taskId = taskId;
+//	}
+//
+//	public String getAgentUid() {
+//		return agentUid;
+//	}
+//
+//	public void setAgentUid(String agentUid) {
+//		this.agentUid = agentUid;
+//	}
 
 }

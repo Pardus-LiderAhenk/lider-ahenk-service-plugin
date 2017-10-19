@@ -26,6 +26,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -77,7 +78,7 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 		inactiveImage = new Image(Display.getDefault(),
 				this.getClass().getClassLoader().getResourceAsStream("icons/16/inactive.png"));
 
-		getServices();
+		
 	}
 
 	@Override
@@ -93,6 +94,8 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 
 		createButtonsArea(composite);
 		createTableArea(composite);
+		
+		getServices();
 
 		return null;
 	}
@@ -261,6 +264,15 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 
 	private void getServices() {
 		try {
+			
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (getProgressBar() != null) {
+						getProgressBar().setVisible(true);
+					}
+				}
+			});
 			TaskRequest task = new TaskRequest(new ArrayList<String>(getDnSet()), DNType.AHENK, getPluginName(),
 					getPluginVersion(), "GET_SERVICES", null, null, null, new Date());
 			TaskRestUtils.execute(task);
@@ -371,6 +383,16 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 
 							@Override
 							public void run() {
+								
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										if (getProgressBar() != null) {
+											getProgressBar().setVisible(false);
+										}
+									}
+								});
+								
 								if (responseData != null && responseData.containsKey("ResultMessage")) {
 									getServices();
 								} else if (responseData != null && responseData.containsKey("service_list")) {
@@ -413,6 +435,12 @@ public class ServiceListTaskDialog extends DefaultTaskDialog {
 		return (HashMap) obj;
 	}
 	
+	
+	@Override
+	protected Point getInitialSize() {
+		// TODO Auto-generated method stub
+		return new Point(1200,800);
+	}
 	
 	/**
 	 * column width number must be same column name 

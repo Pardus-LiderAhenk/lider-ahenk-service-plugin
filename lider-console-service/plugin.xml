@@ -25,6 +25,12 @@
             name="%command.servicereport.onlineahenk">
       </command>
       
+      <command
+            categoryId="tr.org.liderahenk.liderconsole.commands.category"
+            id="tr.org.liderahenk.liderconsole.commands.ServiceMonitorList"
+            name="%command.servicemonitor.editor">
+      </command>
+      
       
    </extension>
    
@@ -44,6 +50,10 @@
             commandId="tr.org.liderahenk.liderconsole.commands.ServiceReportOnlineAhenk">
       </handler>
       
+        <handler
+            class="tr.org.liderahenk.service.handlers.ServiceMonitorListHandler"
+            commandId="tr.org.liderahenk.liderconsole.commands.ServiceMonitorList">
+      </handler>
        
   </extension>
   
@@ -132,8 +142,19 @@
 	          icon="icons/16/services.png"
 	          tooltip="%command.servicereport.onlineahenk">
         </command>
-  		
-    </menuContribution>
+  			
+    	</menuContribution>
+    	
+    	<menuContribution
+            locationURI="menu:tr.org.liderahenk.liderconsole.menus.LiderMain?after=additions">
+  		<command
+           	  commandId="tr.org.liderahenk.liderconsole.commands.ServiceMonitorList"
+	          id="tr.org.liderahenk.liderconsole.commands.ServiceMonitorList"
+	          icon="icons/16/services.png"
+	          tooltip="%command.servicemonitor.editor">
+        </command>
+  			
+    	</menuContribution>
 		
 		
   </extension>
@@ -175,7 +196,17 @@
 		    icon="icons/16/services.png"
 		    id="tr.org.liderahenk.service.editors.ServiceReportOnlineAhenkEditor"
 		    name="%command.servicereport.onlineahenk">
-	    </editor> 		
+	    </editor> 	
+	    
+	    
+	    <editor
+		    class="tr.org.liderahenk.service.editors.ServiceMonitorListEditor"
+		    icon="icons/16/services.png"
+		    id="tr.org.liderahenk.service.editors.ServiceMonitorListEditor"
+		    name="%command.servicemonitor.editor">
+	    </editor> 
+	    
+	    	
 	</extension>
   
 </plugin>

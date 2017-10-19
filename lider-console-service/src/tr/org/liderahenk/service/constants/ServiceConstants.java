@@ -13,7 +13,11 @@ public class ServiceConstants {
 	}
 	public static final String SERVICE_REQUESTS_PARAMETERS = "serviceRequestParameters";
 	
+	public static final String SERVICE_MANAGE_PARAM = "serviceManageParam";
+	
 	public static final String LIDER_SERVICEREPORTONLINEUSER_EDITOR = "tr.org.liderahenk.service.editors.ServiceReportOnlineAhenkEditor";
+	
+	public static final String LIDER_MONITORLIST_EDITOR = "tr.org.liderahenk.service.editors.ServiceMonitorListEditor";
 
 	
 }

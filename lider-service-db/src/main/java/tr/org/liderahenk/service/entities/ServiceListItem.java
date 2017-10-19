@@ -31,24 +31,27 @@ public class ServiceListItem implements Serializable {
 	@Column(name = "SERVICE_ID")
 	private Long id;
 	
-	@Column(name = "OWNER")
-	private String owner;
+//	@Column(name = "OWNER")
+//	private String owner;
 	
 	
-	@Column(name = "AGENT_ID")
-	private Long agentId;
+//	@Column(name = "AGENT_ID")
+//	private Long agentId;
 	
 	@Column(name = "AGENT_DN")
 	private String agentDn;
-		
+
+//	@Column(name = "AGENT_UID")
+//	private String agentUid;
+	
 	@Column(name = "SERVICE_NAME")
 	private String serviceName;
 	
 	@Column(name = "STATUS")
 	private String serviceStatus;
 	
-	@Column(name = "TASK_ID")
-	private Long taskId;
+//	@Column(name = "TASK_ID")
+//	private Long taskId;
 	
 	@Column(name = "DELETED")
 	private boolean deleted = false;
@@ -88,13 +91,13 @@ public class ServiceListItem implements Serializable {
 		this.id = id;
 	}
 
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+//	public String getOwner() {
+//		return owner;
+//	}
+//
+//	public void setOwner(String owner) {
+//		this.owner = owner;
+//	}
 
 	public String getServiceName() {
 		return serviceName;
@@ -160,13 +163,13 @@ public class ServiceListItem implements Serializable {
 		this.isServiceMonitoring = isServiceMonitoring;
 	}
 
-	public Long getAgentId() {
-		return agentId;
-	}
-
-	public void setAgentId(Long agentId) {
-		this.agentId = agentId;
-	}
+//	public Long getAgentId() {
+//		return agentId;
+//	}
+//
+//	public void setAgentId(Long agentId) {
+//		this.agentId = agentId;
+//	}
 
 	public String getDesiredServiceStatus() {
 		return desiredServiceStatus;
@@ -192,14 +195,20 @@ public class ServiceListItem implements Serializable {
 		this.agentDn = agentDn;
 	}
 
-	public Long getTaskId() {
-		return taskId;
-	}
-
-	public void setTaskId(Long taskId) {
-		this.taskId = taskId;
-	}
-	
-	
+//	public Long getTaskId() {
+//		return taskId;
+//	}
+//
+//	public void setTaskId(Long taskId) {
+//		this.taskId = taskId;
+//	}
+//
+//	public String getAgentUid() {
+//		return agentUid;
+//	}
+//
+//	public void setAgentUid(String agentUid) {
+//		this.agentUid = agentUid;
+//	}
 	
 }

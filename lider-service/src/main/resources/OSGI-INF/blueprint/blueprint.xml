@@ -50,12 +50,7 @@
 	</bean>
 
 	<!-- ICommand implementation is used to process a task execution -->
-	<service ref="ServiceCommand">
-		<interfaces>
-			<value>tr.org.liderahenk.lider.core.api.plugin.ICommand</value>
-			<value>tr.org.liderahenk.lider.core.api.plugin.ITaskAwareCommand</value>
-		</interfaces>
-	</service>
+	<service ref="ServiceCommand" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand"  />
 	
 	<bean id="ServiceCommand" class="tr.org.liderahenk.service.commands.ServiceCommand">
 		<property name="resultFactory" ref="resultFactory" />
@@ -74,6 +69,15 @@
 		<property name="resultFactory" ref="resultFactory" />
 		<property name="pluginInfo" ref="pluginInfoImpl" />
 		<property name="taskDao" ref="taskDao" />
+		<property name="pluginDbService" ref="pluginDbService" />
+	</bean>
+	
+	
+	<!-- ICommand implementation is used to process a task execution -->
+	<service ref="DeleteServices" interface="tr.org.liderahenk.lider.core.api.plugin.ICommand" />
+	<bean id="DeleteServices" class="tr.org.liderahenk.service.commands.DeleteServiceCommand">
+		<property name="resultFactory" ref="resultFactory" />
+		<property name="pluginInfo" ref="pluginInfoImpl" />
 		<property name="pluginDbService" ref="pluginDbService" />
 	</bean>
 

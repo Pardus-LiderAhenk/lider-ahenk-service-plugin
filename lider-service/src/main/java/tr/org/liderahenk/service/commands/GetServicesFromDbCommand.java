@@ -45,24 +45,24 @@ public class GetServicesFromDbCommand implements ICommand {
 			
 			List<ServiceListItem> resultList=new ArrayList<ServiceListItem>();
 			
-			for (ServiceListItem serviceListItem : servicesFromDB) {
-				
-				for (String dn : dnList) {
-					if(dn.equals(serviceListItem.getAgentDn()))
-					{
-						if(serviceListItem.getTaskId()!=null){
-							long taskId= serviceListItem.getTaskId();
-							
-							ITask task= taskDao.find(taskId);
-							if (task.isDeleted() == true){
-								serviceListItem.setServiceMonitoring(false);
-								serviceListItem.setServiceStatus("");
-							}
-						}
-						resultList.add(serviceListItem);
-					}
-				}
-			}
+//			for (ServiceListItem serviceListItem : servicesFromDB) {
+//				
+//				for (String dn : dnList) {
+//					if(dn.equals(serviceListItem.getAgentDn()))
+//					{
+//						if(serviceListItem.getTaskId()!=null){
+//							long taskId= serviceListItem.getTaskId();
+//							
+//							ITask task= taskDao.find(taskId);
+//							if (task.isDeleted() == true){
+//								serviceListItem.setServiceMonitoring(false);
+//								serviceListItem.setServiceStatus("");
+//							}
+//						}
+//						resultList.add(serviceListItem);
+//					}
+//				}
+//			}
 			
 			resultMessages = new ArrayList<String>();
 			resultMessages.add("İşlem Başarılı");

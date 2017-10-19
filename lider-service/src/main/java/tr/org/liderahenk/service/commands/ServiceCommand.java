@@ -31,7 +31,7 @@ import tr.org.liderahenk.lider.core.api.service.ICommandResultFactory;
 import tr.org.liderahenk.lider.core.api.service.enums.CommandResultStatus;
 import tr.org.liderahenk.service.entities.ServiceListItem;
 
-public class ServiceCommand implements ICommand, ITaskAwareCommand {
+public class ServiceCommand implements ICommand {
 
 	private static Logger logger = LoggerFactory.getLogger(ServiceCommand.class);
 	
@@ -48,51 +48,64 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 	@Override
 	public ICommandResult execute(ICommandContext context) {
 		
-		logger.info("ServiceCommand executing");
-		
-		 ITaskRequest req = context.getRequest();
-	
-		 deleteAllCronTasks(req);
-		 
-		 Map<String, Object> parameterMap = req.getParameterMap();
-		 
-		 ObjectMapper mapper = new ObjectMapper();
-		 mapper.configure(
-				    DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-		 try {
-			List<ServiceListItem> serviceList = mapper.readValue(mapper.writeValueAsString(parameterMap.get("serviceRequestParameters")),
-						new TypeReference<List<ServiceListItem>>() {
-				});
-			
-			if(serviceList!=null && serviceList.size()>0){
-				for (ServiceListItem serviceListItem : serviceList) {
-					
-					if(serviceListItem.getId()==null){
-						serviceListItem.setCreateDate(new Date());
-						serviceListItem.setOwner(req.getOwner());
-						pluginDbService.save(serviceListItem);
-						
-					}
-					if(serviceListItem.isUpdated() || serviceListItem.isDeleted()){
-						serviceListItem.setModifyDate(new Date());
-						pluginDbService.update(serviceListItem);
-					}
-				}
-				
-				parameterMap.put("serviceRequestParameters", serviceList);
-				
-			}
-			
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-			return resultFactory.create(CommandResultStatus.ERROR, new ArrayList<String>(), this);
-		} 
+//		logger.info("ServiceCommand executing");
+//		
+//		 ITaskRequest req = context.getRequest();
+//		 
+//		//  List<String> dnList = context.getRequest().getDnList();
+//		 
+//		// deleteAllCronTasks(req);
+//		 
+//		 Map<String, Object> parameterMap = req.getParameterMap();
+//		 
+//		 ObjectMapper mapper = new ObjectMapper();
+//		 mapper.configure(
+//				    DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//
+//		 try {
+//			List<ServiceListItem> serviceList = mapper.readValue(mapper.writeValueAsString(parameterMap.get("serviceRequestParameters")),
+//						new TypeReference<List<ServiceListItem>>() {
+//				});
+//			
+//			if(serviceList!=null && serviceList.size()>0){
+//				
+////				for (ServiceListItem serviceListItem : serviceList) {
+////					
+////					if(serviceListItem.getId()==null){
+////						serviceListItem.setCreateDate(new Date());
+////						serviceListItem.setOwner(req.getOwner());
+////						pluginDbService.save(serviceListItem);
+////					}
+////					//parameterMap.put(serviceListItem.getAgentDn(),serviceListItem);
+////				}
+//				
+////				for (int i = 0; i < dnList.size(); i++) {
+////					
+////					String dn=dnList.get(i);
+////					
+////					List<ServiceListItem> agentServiceList= new ArrayList<ServiceListItem>();
+////					
+////					for (ServiceListItem serviceListItem : serviceList) {
+////						
+////						if(dn.equals(serviceListItem.getAgentDn())){
+////							agentServiceList.add(serviceListItem);
+////						}
+////					}
+////					
+////					parameterMap.put(dn,agentServiceList);
+////				}
+////
+////				parameterMap.put("dnCheck","true");
+//				
+////				parameterMap.put("serviceRequestParameters", serviceList);
+//			}
+//		} catch (Exception e) {
+//			
+//			e.printStackTrace();
+//			return resultFactory.create(CommandResultStatus.ERROR, new ArrayList<String>(), this);
+//		} 
 		return resultFactory.create(CommandResultStatus.OK, new ArrayList<String>(), this);
 	}
-
-	
 	
 	
 	private void deleteAllCronTasks(ITaskRequest req) {
@@ -194,61 +207,56 @@ public class ServiceCommand implements ICommand, ITaskAwareCommand {
 		this.pluginDbService = pluginDbService;
 	}
 
-	@Override
-	public void onTaskUpdate(ICommandExecutionResult result) {
-
-		try {
-			
-			long taskId= result.getCommandExecution().getCommand().getTask().getId();
-
-			byte[] data = result.getResponseData();
-			
-			final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
-					new TypeReference<HashMap<String, Object>>() {
-					});
-
-			ObjectMapper mapper = new ObjectMapper();
-			
-			List<ServiceListItem> services = new ObjectMapper().readValue(mapper.writeValueAsString(responseData.get("services")),
-						new TypeReference<List<ServiceListItem>>() {
-				});
-			
-			if(services!=null)
-				for (ServiceListItem serviceListItem : services) {
-					
-					List<PropertyOrder> orders = new ArrayList<PropertyOrder>();
-					orders.add(new PropertyOrder("createDate", OrderType.DESC));
-					
-					HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
-					propertiesMap.put("id", serviceListItem.getId());
-					
-					List<ServiceListItem> serviceList= pluginDbService.findByProperties(ServiceListItem.class,propertiesMap,orders, 1);
-					if(serviceList!=null && serviceList.size()>0){
-						ServiceListItem service= serviceList.get(0);
-						service.setAgentId(result.getAgentId());
-						service.setDeleted(serviceListItem.isDeleted());
-						service.setDesiredServiceStatus(serviceListItem.getDesiredServiceStatus());
-						service.setDesiredStartAuto(serviceListItem.getDesiredStartAuto());
-						service.setStartAuto(serviceListItem.getStartAuto());
-						
-						
-						service.setServiceStatus(serviceListItem.getServiceStatus());
-						
-						service.setTaskId(taskId);
-						
-						service.setModifyDate(new Date());
-						service.setServiceMonitoring(true);
-						pluginDbService.update(service);
-					}
-				}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	
-		
-	}
+//	@Override
+//	public void onTaskUpdate(ICommandExecutionResult result) {
+//
+//		try {
+//			
+//			long taskId= result.getCommandExecution().getCommand().getTask().getId();
+//
+//			byte[] data = result.getResponseData();
+//			
+//			final Map<String, Object> responseData = new ObjectMapper().readValue(data, 0, data.length,
+//					new TypeReference<HashMap<String, Object>>() {
+//					});
+//
+//			ObjectMapper mapper = new ObjectMapper();
+//			
+//			List<ServiceListItem> services = new ObjectMapper().readValue(mapper.writeValueAsString(responseData.get("services")),
+//						new TypeReference<List<ServiceListItem>>() {
+//				});
+//			
+//			if(services!=null)
+//				for (ServiceListItem serviceListItem : services) {
+//					
+//					List<PropertyOrder> orders = new ArrayList<PropertyOrder>();
+//					orders.add(new PropertyOrder("createDate", OrderType.DESC));
+//					
+//					HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
+//					propertiesMap.put("id", serviceListItem.getId());
+//					
+//					List<ServiceListItem> serviceList= pluginDbService.findByProperties(ServiceListItem.class,propertiesMap,orders, 1);
+//					if(serviceList!=null && serviceList.size()>0){
+//						ServiceListItem service= serviceList.get(0);
+//						service.setAgentId(result.getAgentId());
+//						service.setDeleted(serviceListItem.isDeleted());
+//						service.setDesiredServiceStatus(serviceListItem.getDesiredServiceStatus());
+//						service.setDesiredStartAuto(serviceListItem.getDesiredStartAuto());
+//						service.setStartAuto(serviceListItem.getStartAuto());
+//						service.setServiceStatus(serviceListItem.getServiceStatus());
+//						
+//						service.setTaskId(taskId);
+//						
+//						service.setModifyDate(new Date());
+//						service.setServiceMonitoring(true);
+//						pluginDbService.update(service);
+//					}
+//				}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	public ITaskDao getTaskDao() {
 		return taskDao;
