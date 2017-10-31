@@ -26,7 +26,7 @@ class ServiceManagement(AbstractPlugin):
         self.logger.debug(message)
         return result_code, message
 
-    def is_service_exist(self,service_name):
+    def is_service_exist(self, service_name):
         result_code, p_out, p_err = self.execute("service --status-all")
         p_err = ' ' + p_err
         p_out = ' ' + p_out
@@ -79,7 +79,7 @@ class ServiceManagement(AbstractPlugin):
                                              'mail_content': str(self.context.get_mail_content()),
                                              'mail_subject': str(self.context.get_mail_subject()),
                                              'mail_send': self.context.is_mail_send(),
-                                             'services' :all_services
+                                             'services': all_services
                                          }),
                                          content_type=self.get_content_type().APPLICATION_JSON.value)
         else:
@@ -92,92 +92,128 @@ class ServiceManagement(AbstractPlugin):
                                          }),
                                          content_type=self.get_content_type().APPLICATION_JSON.value)
 
+    def save_service(self, service):
+        cols = ['serviceName', 'serviceStatus', 'timestamp', 'task_id'];
+        values = [service["serviceName"], service["serviceStatus"], self.timestamp(),service['task_id']]
+        return self.db_service.update('service', cols, values)
+
+    def save_service_list(self, service_list):
+        cols = ['serviceName', 'serviceStatus', 'timestamp', 'task_id'];
+        values = [service_list[1], service_list[2], self.timestamp(), service_list[4]]
+        return self.db_service.update('service', cols, values, 'id='+ str(service_list[0]))
+
+    def get_service_status(self,service):
+        service_name = service["serviceName"] + ".service"
+        serviceStatus = service["serviceStatus"]
+        result_code, p_out, p_err = self.execute("systemctl status " + str(service_name) + " | grep 'Active\|Loaded'")
+        # self.logger.debug("-----p_out"+ str(p_out))
+        if 'not-found' in p_out:
+            service["serviceStatus"] = 'Service Not Found'
+
+        elif 'running' in p_out:
+            service["serviceStatus"] = 'Running'
+
+        elif ('inactive' in p_out) or ('failed' in p_out):
+            service["serviceStatus"] = 'Stopped'
+        elif ('abandoned' in p_out):
+            service["serviceStatus"] = 'Active Abandoned'
+        else:
+            service["serviceStatus"] = 'Running'
+
+        return service
+
+    def save_service_status(self, service):
+        service= self.get_service_status(service)
+        self.save_service(service)
+
+
+    def get_services_status(self, services):
+        for service in services:
+            service= self.get_service_status(service)
+
+    def get_services_status_and_save(self, services):
+        for service in services:
+            service= self.get_service_status(service)
+            service_id_from_db=self.save_service(service)
+            service['id']=service_id_from_db
 
     def handle_task(self):
         try:
             self.logger.debug("Service Management task is started.")
-            servicesAll = self.data['serviceRequestParameters']
+            services = self.data['serviceManageParam']
+            task_id= self.context.get('task_id')
+            # setting task id
+            for srv in services:
+                srv['task_id']=task_id
+                srv['agentDn']=self.Ahenk.dn()
+                srv['isServiceMonitoring']= True
 
-            services = []
+            db_services = self.db_service.select('service', '*','task_id=' +str(task_id))
 
-            for srvc in servicesAll :
-                if srvc["agentDn"] == self.Ahenk.dn():
-                    services.append(srvc)
+            if len(db_services) < 1:
+                self.get_services_status_and_save(services)
 
+                stopped_services = ''
+                for servc in services:
+                    if servc['serviceStatus'] == 'Stopped':
+                        stopped_services += servc['serviceName'] + ' ,'
 
-            stopped_services = ''
-
-            result_code, p_out, p_err = self.execute("systemctl list-unit-files --type service")
-
-            p_err = ' ' + p_err
-            p_out = ' ' + p_out
-            lines = p_out.split('\n')
-
-            for service in services:
-                service_name = service["serviceName"]+".service"
-                serviceStatus = service["serviceStatus"]
-                is_service_deleted= service["deleted"]
-
-                #service["serviceStatus"]= "exist" if self.is_service_exist(service_name) else "not_exist"
-
-                result_code, p_out, p_err = self.execute("systemctl status "+ str(service_name))
-
-                if 'not-found' in p_out :
-                    service["serviceStatus"] = 'Service Not Found'
-
-                elif 'running' in p_out:
-                    service["serviceStatus"] = 'Running'
-
-                elif ('inactive' in p_out) or ('failed' in p_out):
-                    service["serviceStatus"] = 'Stopped'
-
-                if service["serviceStatus"] == 'Stopped' and is_service_deleted is False:
-                    stopped_services += service_name + " ,";
-
-                # if (service_name in p_out) is False:
-                #     service["serviceStatus"] = 'NOTFOUND'
-                # else :
-                #     for line in lines:
-                #         line_split = line.split(' ')
-                #         if len(line_split) >= 2:
-                #             name = line_split[0]
-                #             if service_name == name :
-                #                 if  line_split[1] == 'enabled':
-                #                     service["serviceStatus"] = "ACTIVE"
-                #                 elif line_split[1] == 'disabled':
-                #                     service["serviceStatus"] = 'INACTIVE'
-                #
-                #     if service["serviceStatus"] == 'INACTIVE' and is_service_deleted is False:
-                #         stopped_services += service_name + " ,";
-
-            if stopped_services != '':
-                self.send_mail(stopped_services,services)
-            else :
-                self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
+                if stopped_services != '':
+                    self.send_mail(stopped_services, services)
+                else:
+                    self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
                                              message='Servis izleme görevi başarıyla oluşturuldu.',
                                              data=json.dumps({
                                                  'Result': 'İşlem Başarı ile gercekleştirildi',
-                                                 'services': services
+                                                 'services': services,
                                              }),
                                              content_type=self.get_content_type().APPLICATION_JSON.value)
+            else:
+                servicesStatusChanged =[]
+                self.get_services_status(services)
+                for srv in services:
+                    isExist=False;
+                    for srvDb in db_services:
+                        if srv['serviceName'] == srvDb[1]:
+                            isExist=True
+                    if isExist ==False:
+                        srv=self.get_service_status(srv)
+                        self.save_service(srv)
 
-            # service_name = str((self.data)['serviceName'])
-            # service_status = str((self.data)['serviceStatus'])
-            # start_auto = bool((self.data)['startAuto'])
-            # if service_status == 'Start' or service_status == 'Başlat':
-            #     service_action = 'start'
-            # else:
-            #     service_action = 'stop'
-            # result_code, message = self.start_stop_service(service_name, service_action)
-            # if result_code == 0 and start_auto is True:
-            #     result_code, message = self.set_startup_service(service_name)
-            # if result_code == 0:
-            #     self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
-            #                                  message='Servis başlatma/durdurma/otomatik başlatma işlemi başarıyla gerçekleştirildi',
-            #                                  data=json.dumps(self.data),
-            #                                  content_type=self.get_content_type().APPLICATION_JSON.value)
-            # else:
-            #     self.context.create_response(code=self.message_code.TASK_ERROR.value, message=message)
+
+                for srv in services:
+                    for srvDb in db_services:
+                        srvDbList=list(srvDb)
+                        if  srv['serviceName'] == srvDb[1] and srv['serviceStatus'] != srvDbList[2]:
+                            srvDbList[2]=srv['serviceStatus']
+                            self.save_service_list(srvDbList)
+                            servicesStatusChanged.append(srv)
+
+                if len(servicesStatusChanged)>0:
+
+                    stopped_services=''
+                    for servc in servicesStatusChanged:
+                        if servc['serviceStatus']== 'Stopped' :
+                            stopped_services += servc['serviceName'] + ' ,'
+
+                    if stopped_services != '':
+
+                        self.send_mail(stopped_services,servicesStatusChanged)
+
+                    else:
+                        self.context.create_response(code=self.message_code.TASK_PROCESSED.value,
+                                                     message='Servis izleme görevi başarıyla oluşturuldu.',
+                                                     data=json.dumps({
+                                                         'Result': 'İşlem Başarı ile gercekleştirildi',
+                                                         'services': servicesStatusChanged
+                                                     }),
+                                                     content_type=self.get_content_type().APPLICATION_JSON.value)
+                else:
+                    self.context.create_response(code=None,
+                                                 message='Servis izleme görevi başarıyla oluşturuldu.',
+                                                 data=None,
+                                                 content_type=self.get_content_type().APPLICATION_JSON.value)
+
 
         except Exception as e:
             self.logger.error(str(e))
