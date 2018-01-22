@@ -61,6 +61,7 @@ import tr.org.liderahenk.liderconsole.core.utils.PdfExporter;
 import tr.org.liderahenk.liderconsole.core.widgets.Notifier;
 import tr.org.liderahenk.liderconsole.core.xmpp.XMPPClient;
 import tr.org.liderahenk.liderconsole.core.xmpp.notifications.TaskStatusNotification;
+import tr.org.liderahenk.service.constants.ServiceConstants;
 import tr.org.liderahenk.service.i18n.Messages;
 
 public class ServiceReportOnlineAhenkEditor  extends EditorPart{
@@ -325,7 +326,7 @@ public class ServiceReportOnlineAhenkEditor  extends EditorPart{
 					dns.add(agentDn);
 					
 					TaskRequest task = new TaskRequest(dns, DNType.AHENK, "service",
-							"1.0.0", "GET_SERVICES", null, null, null, new Date());
+							ServiceConstants.PLUGIN_VERSION, "GET_SERVICES", null, null, null, new Date());
 					TaskRestUtils.execute(task);
 
 				} catch (Exception e) {
